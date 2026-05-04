@@ -1,12 +1,20 @@
 import { Component, signal } from '@angular/core';
-import { Header } from './header/header';
+import { Header } from './component/header/header';
 import { Navbar } from './navbar/navbar';
+import { RouterOutlet } from '@angular/router';
 
 @Component({
+  standalone: true,
   selector: 'app-root',
-  imports: [Header, Navbar],
-  templateUrl: './app.html',
-  styleUrl: './app.css'
+  imports: [Header, Navbar, RouterOutlet],
+  template: `
+    <app-header></app-header>
+    <app-navbar></app-navbar>
+    <main class="content">
+      <router-outlet></router-outlet>
+    </main>
+  `,
+  styleUrl: './app.css',
 })
 export class App {
   protected readonly title = signal('WarehouseFE');

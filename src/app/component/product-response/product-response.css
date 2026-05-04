@@ -1,0 +1,23 @@
+.api-response {
+  padding: 16px;
+  margin-top: 20px;
+  border-radius: 6px;
+  background-color: #f8f9fa;
+  border: 1px solid #e9ecef;
+}
+
+.api-response pre {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.5;
+  color: #333;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+.api-response pre.error {
+  color: #d32f2f;
+  background-color: #ffebee;
+  padding: 12px;
+  border-radius: 4px;
+}

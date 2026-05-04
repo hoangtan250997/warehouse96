@@ -1,0 +1,8 @@
+{
+  "/api": {
+    "target": "https://backend-python-do-an-h6bgeyarhfeagqff.malaysiawest-01.azurewebsites.net",
+    "secure": true,
+    "changeOrigin": true,
+    "logLevel": "debug"
+  }
+}

@@ -1,15 +1,16 @@
 import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ProductService } from '../service/product.service';
+import { ProductService } from '../../service/product.service';
+import { ProductResponse } from '../product-response/product-response';
 
 @Component({
   standalone: true,
-  selector: 'app-navbar',
-  imports: [CommonModule],
-  templateUrl: './navbar.html',
-  styleUrl: './navbar.css',
+  selector: 'app-phone-item',
+  imports: [CommonModule, ProductResponse],
+  templateUrl: './phone-item.html',
+  styleUrl: './phone-item.css',
 })
-export class Navbar {
+export class PhoneItem {
   private readonly productService = inject(ProductService);
 
   readonly loading = signal(false);

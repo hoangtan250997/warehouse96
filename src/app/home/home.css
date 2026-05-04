@@ -1,0 +1,9 @@
+.home-page {
+  max-width: 780px;
+  margin: 2rem auto;
+  padding: 1.5rem;
+}
+
+.home-page h1 {
+  margin-bottom: 1rem;
+}

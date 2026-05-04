@@ -1,0 +1,5 @@
+<div class="api-response">
+  <pre *ngIf="isLoading()">Loading Apple phone products...</pre>
+  <pre *ngIf="getError()" class="error">{{ getError() }}</pre>
+  <pre *ngIf="getResponse()">{{ getResponse() | json }}</pre>
+</div>

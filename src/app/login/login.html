@@ -1,0 +1,33 @@
+<section class="login-page">
+  <h1>Login</h1>
+
+  <form [formGroup]="loginForm" (ngSubmit)="submitLogin($event)">
+    <label>
+      Username
+      <input type="text" formControlName="username" placeholder="Username" />
+      <div
+        *ngIf="loginForm.get('username')?.invalid && loginForm.get('username')?.touched"
+        class="field-error"
+      >
+        Username is required.
+      </div>
+    </label>
+
+    <label>
+      Password
+      <input type="password" formControlName="password" placeholder="Password" />
+      <div
+        *ngIf="loginForm.get('password')?.invalid && loginForm.get('password')?.touched"
+        class="field-error"
+      >
+        Password is required.
+      </div>
+    </label>
+
+    <button type="submit" [disabled]="loginLoading()">Sign in</button>
+  </form>
+
+  <div *ngIf="loginLoading()" class="status">Logging in…</div>
+  <div *ngIf="loginError()" class="error">{{ loginError() }}</div>
+  <pre *ngIf="loginResponse()">{{ loginResponse() | json }}</pre>
+</section>
