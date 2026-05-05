@@ -1,5 +1,35 @@
-<div class="api-response">
-  <pre *ngIf="isLoading()">Loading Apple phone products...</pre>
-  <pre *ngIf="getError()" class="error">{{ getError() }}</pre>
-  <pre *ngIf="getResponse()">{{ getResponse() | json }}</pre>
+<div class="product-section">
+  <div *ngIf="loading" class="loading-state">
+    <div class="spinner"></div>
+    <span>Đang tải sản phẩm...</span>
+  </div>
+
+  <div *ngIf="error" class="error-state">
+    <span class="error-icon">&#9888;</span>
+    {{ error }}
+  </div>
+
+  <ng-container *ngIf="response as res">
+    <div class="product-grid">
+      <div class="product-card" *ngFor="let item of res.items">
+        <div class="product-img">&#128241;</div>
+        <div class="product-body">
+          <div class="product-label">{{ item.label }}</div>
+          <div class="product-meta">
+            <span class="product-unit">/ cái</span>
+            <span class="product-price">{{ formatPrice(item.current_price) }}</span>
+          </div>
+          <div class="stock-info">Tồn kho: <strong>{{ getStock(item.id) }}</strong></div>
+          <div class="quantity-control">
+            <button class="qty-btn" (click)="decrement(item.id)" [disabled]="getQuantity(item.id) === 0">−</button>
+            <span class="qty-value">{{ getQuantity(item.id) }}</span>
+            <button class="qty-btn" (click)="increment(item.id)" [disabled]="getQuantity(item.id) >= getStock(item.id)">+</button>
+          </div>
+          <button class="create-order-btn" (click)="onAddToCart(item)" [disabled]="getQuantity(item.id) === 0">
+            Tạo phiếu xuất
+          </button>
+        </div>
+      </div>
+    </div>
+  </ng-container>
 </div>

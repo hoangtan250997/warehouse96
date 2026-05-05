@@ -1,15 +1,16 @@
 import { Component, signal } from '@angular/core';
 import { Header } from './component/header/header';
 import { Navbar } from './navbar/navbar';
-import { RouterOutlet } from '@angular/router';
+import { RouterOutlet, Router } from '@angular/router';
+import { CommonModule } from '@angular/common';
 
 @Component({
   standalone: true,
   selector: 'app-root',
-  imports: [Header, Navbar, RouterOutlet],
+  imports: [Header, Navbar, RouterOutlet, CommonModule],
   template: `
     <app-header></app-header>
-    <app-navbar></app-navbar>
+    <app-navbar *ngIf="!isLoginPage()"></app-navbar>
     <main class="content">
       <router-outlet></router-outlet>
     </main>
@@ -18,4 +19,10 @@ import { RouterOutlet } from '@angular/router';
 })
 export class App {
   protected readonly title = signal('WarehouseFE');
+
+  constructor(private router: Router) {}
+
+  isLoginPage(): boolean {
+    return this.router.url === '/login';
+  }
 }

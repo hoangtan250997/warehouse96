@@ -51,4 +51,13 @@ export class AuthService {
     const token = this.getAccessToken();
     return token ? `${this.getTokenType()} ${token}` : null;
   }
+
+  isLoggedIn(): boolean {
+    return !!this.getAccessToken();
+  }
+
+  logout(): void {
+    localStorage.removeItem(this.tokenKey);
+    localStorage.removeItem(this.typeKey);
+  }
 }

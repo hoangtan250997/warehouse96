@@ -1,30 +1,22 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ProductService } from '../service/product.service';
+import { ProductStateService } from '../service/product-state.service';
 
 @Component({
   standalone: true,
   selector: 'app-navbar',
   imports: [CommonModule],
   templateUrl: './navbar.html',
-  styleUrl: './navbar.css',
+  styleUrls: ['./navbar.css'],
 })
 export class Navbar {
-  private readonly productService = inject(ProductService);
-
-  readonly loading = signal(false);
-  readonly error = signal<string | null>(null);
-  readonly response = signal<any>(null);
+  private readonly productState = inject(ProductStateService);
 
   loadPhones(): void {
-    this.loading.set(true);
-    this.error.set(null);
-    this.response.set(null);
+    this.productState.loadPhones();
+  }
 
-    this.productService.fetchPhoneProducts().subscribe({
-      next: (data) => this.response.set(data),
-      error: (err) => this.error.set('API request failed: ' + (err?.message ?? err)),
-      complete: () => this.loading.set(false),
-    });
+  fetchBrands(productTypeId: number): void {
+    this.productState.loadBrands(productTypeId);
   }
 }

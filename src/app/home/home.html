@@ -1,27 +1,150 @@
 <section class="home-page">
-  <div class="hero-card">
-    <div>
-      <h1>Welcome to WarehouseFE</h1>
-      <p>Browse products, manage inventory, and interact with authenticated APIs seamlessly.</p>
+
+  <div *ngIf="productState.brandsLoading()" class="brands-loading">
+    <div class="spinner"></div>
+    <span>Đang tải thương hiệu...</span>
+  </div>
+
+  <div *ngIf="productState.brandsError()" class="brands-error">
+    <span>&#9888;</span> {{ productState.brandsError() }}
+  </div>
+
+  <ng-container *ngIf="productState.brands().length > 0">
+    <div class="brand-bar">
+      <button
+        *ngFor="let brand of productState.brands()"
+        class="brand-chip"
+        [class.active]="productState.selectedBrandId() === brand.id"
+        (click)="loadPhonesByBrand(brand.id)">
+        {{ brand.label }}
+      </button>
     </div>
-    <div class="hero-actions">
-      <button>Start browsing</button>
-      <button class="secondary">View products</button>
+  </ng-container>
+
+  <app-product-response
+    [loading]="productState.loading()"
+    [error]="productState.error()"
+    [response]="productState.response()"
+    (openForm)="onOpenForm($event)">
+  </app-product-response>
+
+  <!-- Modal overlay -->
+  <div class="modal-overlay" *ngIf="selectedItem()" (click)="closeModal()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <div>
+          <div class="modal-title">📦 Tạo phiếu xuất kho</div>
+          <div class="modal-subtitle">{{ selectedItem()!.product.label }} — SL: {{ selectedItem()!.quantity }}</div>
+        </div>
+        <button class="modal-close" (click)="closeModal()">✕</button>
+      </div>
+
+      <ng-container *ngIf="!submitSuccess(); else successBlock">
+        <form class="checkout-form" (ngSubmit)="submitOrder()" #orderForm="ngForm">
+          <div class="form-row">
+            <div class="form-group">
+              <label>Mã phiếu *</label>
+              <input type="text" [(ngModel)]="form.code" name="code" maxlength="20" required />
+            </div>
+            <div class="form-group">
+              <label>Khách hàng *</label>
+              <select [(ngModel)]="form.customerId" name="customerId" required>
+                <option value="">-- Chọn khách hàng --</option>
+                <option *ngFor="let c of customers()" [value]="c.id">{{ c.label }} ({{ c.code }})</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Ngày giao *</label>
+              <input type="datetime-local" [(ngModel)]="form.deliveryDate" name="deliveryDate" required />
+            </div>
+            <div class="form-group">
+              <label>Trạng thái</label>
+              <select [(ngModel)]="form.deliveryStatus" name="deliveryStatus">
+                <option value="draft">Draft</option>
+                <option value="confirmed">Confirmed</option>
+                <option value="shipped">Shipped</option>
+                <option value="received">Received</option>
+                <option value="completed">Completed</option>
+                <option value="canceled">Canceled</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Giảm giá (VND)</label>
+              <input type="number" [(ngModel)]="form.discountAmount" name="discountAmount" min="0" />
+            </div>
+            <div class="form-group">
+              <label>Giảm giá (%)</label>
+              <input type="number" [(ngModel)]="form.discountPercent" name="discountPercent" min="0" max="100" />
+            </div>
+          </div>
+
+          <div class="form-group full-width">
+            <label>Ghi chú</label>
+            <textarea [(ngModel)]="form.record" name="record" rows="2" maxlength="500"></textarea>
+          </div>
+
+          <div *ngIf="submitError()" class="submit-error">&#9888; {{ submitError() }}</div>
+
+          <div class="modal-actions">
+            <button type="button" class="cancel-btn" (click)="closeModal()">Hủy</button>
+            <button type="submit" class="submit-btn" [disabled]="submitting() || orderForm.invalid">
+              {{ submitting() ? 'Đang xử lý...' : 'Tạo phiếu xuất kho' }}
+            </button>
+          </div>
+        </form>
+      </ng-container>
+
+      <ng-template #successBlock>
+        <div class="submit-success">&#10003; Tạo phiếu xuất kho thành công!</div>
+
+        <ng-container *ngIf="gdnResponse() as gdn">
+          <div class="gdn-grid">
+            <div class="gdn-field"><span>ID</span><strong>{{ gdn.id }}</strong></div>
+            <div class="gdn-field"><span>Mã phiếu</span><strong>{{ gdn.code }}</strong></div>
+            <div class="gdn-field"><span>Khách hàng ID</span><strong>{{ gdn.customer_id }}</strong></div>
+            <div class="gdn-field"><span>Nhân viên ID</span><strong>{{ gdn.employee_id }}</strong></div>
+            <div class="gdn-field"><span>Ngày giao</span><strong>{{ gdn.delivery_date | date:'dd/MM/yyyy HH:mm' }}</strong></div>
+            <div class="gdn-field"><span>Trạng thái</span><strong>{{ gdn.delivery_status }}</strong></div>
+            <div class="gdn-field"><span>Giảm giá (VND)</span><strong>{{ gdn.discount_amount }}</strong></div>
+            <div class="gdn-field"><span>Giảm giá (%)</span><strong>{{ gdn.discount_percent }}</strong></div>
+            <div class="gdn-field"><span>Tổng tiền</span><strong class="total">{{ gdn.final_total | number:'1.0-0' }} ₫</strong></div>
+            <div class="gdn-field"><span>Ghi chú</span><strong>{{ gdn.record || '—' }}</strong></div>
+          </div>
+
+          <table class="gdn-items-table">
+            <thead>
+              <tr>
+                <th>Sản phẩm ID</th>
+                <th>Đơn giá</th>
+                <th>Số lượng</th>
+                <th>Thành tiền</th>
+                <th>Serial numbers</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let item of gdn.items">
+                <td>{{ item.product_id }}</td>
+                <td>{{ item.unit_price | number:'1.0-0' }} ₫</td>
+                <td>{{ item.quantity }}</td>
+                <td>{{ item.final_price | number:'1.0-0' }} ₫</td>
+                <td>{{ item.serial_numbers?.join(', ') || '—' }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </ng-container>
+
+        <div class="modal-actions">
+          <button type="button" class="submit-btn" (click)="closeModal()">Đóng</button>
+        </div>
+      </ng-template>
     </div>
   </div>
 
-  <div class="home-grid">
-    <article class="feature-card">
-      <h2>Authenticated API</h2>
-      <p>Requests automatically include your access token after login, keeping your data secure.</p>
-    </article>
-    <article class="feature-card">
-      <h2>Smart navigation</h2>
-      <p>The sidebar gives you quick category access and a clean product browsing experience.</p>
-    </article>
-    <article class="feature-card">
-      <h2>Responsive layout</h2>
-      <p>The layout adjusts nicely on smaller screens while keeping the content easy to read.</p>
-    </article>
-  </div>
 </section>
+
