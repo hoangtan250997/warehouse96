@@ -25,9 +25,14 @@
             <span class="qty-value">{{ getQuantity(item.id) }}</span>
             <button class="qty-btn" (click)="increment(item.id)" [disabled]="getQuantity(item.id) >= getStock(item.id)">+</button>
           </div>
-          <button class="create-order-btn" (click)="onAddToCart(item)" [disabled]="getQuantity(item.id) === 0">
-            Tạo phiếu xuất
-          </button>
+          <div class="card-actions">
+            <button class="create-order-btn" (click)="onAddToCart(item)" [disabled]="getQuantity(item.id) === 0">
+              Tạo phiếu xuất
+            </button>
+            <button class="create-receipt-btn" (click)="onCreateReceipt(item)" [disabled]="getQuantity(item.id) === 0">
+              Tạo phiếu nhập
+            </button>
+          </div>
         </div>
       </div>
     </div>

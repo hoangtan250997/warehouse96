@@ -7,7 +7,9 @@ const PHONE_BRANDS_API_URL = '/api/v1/products/brands';
 const CURRENT_STOCK_API_URL = '/api/v1/inventory/current-stock';
 const INVENTORY_API_URL = '/api/v1/inventory';
 const CUSTOMERS_API_URL = '/api/v1/customers';
+const SUPPLIERS_API_URL = '/api/v1/suppliers';
 const GDN_API_URL = '/api/v1/goods-delivery-notes';
+const GRN_API_URL = '/api/v1/goods-receipt-notes';
 
 @Injectable({
   providedIn: 'root',
@@ -49,7 +51,19 @@ export class ProductService {
     return this.http.get<any>(CUSTOMERS_API_URL);
   }
 
+  fetchSuppliers(): Observable<any> {
+    return this.http.get<any>(SUPPLIERS_API_URL);
+  }
+
   createGoodsDeliveryNote(body: any): Observable<any> {
     return this.http.post<any>(GDN_API_URL, body);
+  }
+
+  createGoodsReceiptNote(body: any): Observable<any> {
+    return this.http.post<any>(GRN_API_URL, body);
+  }
+
+  createProduct(body: any): Observable<any> {
+    return this.http.post<any>(PHONE_PRODUCTS_API_URL, body);
   }
 }

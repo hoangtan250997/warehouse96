@@ -18,6 +18,7 @@
         (click)="loadPhonesByBrand(brand.id)">
         {{ brand.label }}
       </button>
+      <button class="add-product-btn" (click)="openProductModal()" title="Thêm sản phẩm mới">＋</button>
     </div>
   </ng-container>
 
@@ -25,7 +26,8 @@
     [loading]="productState.loading()"
     [error]="productState.error()"
     [response]="productState.response()"
-    (openForm)="onOpenForm($event)">
+    (openForm)="onOpenForm($event)"
+    (openReceiptForm)="onOpenReceiptForm($event)">
   </app-product-response>
 
   <!-- Modal overlay -->
@@ -141,6 +143,193 @@
 
         <div class="modal-actions">
           <button type="button" class="submit-btn" (click)="closeModal()">Đóng</button>
+        </div>
+      </ng-template>
+    </div>
+  </div>
+
+  <!-- GRN Modal - Phiếu nhập kho -->
+  <div class="modal-overlay" *ngIf="selectedReceiptItem()" (click)="closeReceiptModal()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <div>
+          <div class="modal-title">📥 Tạo phiếu nhập kho</div>
+          <div class="modal-subtitle">{{ selectedReceiptItem()!.product.label }} — SL: {{ selectedReceiptItem()!.quantity }}</div>
+        </div>
+        <button class="modal-close" (click)="closeReceiptModal()">✕</button>
+      </div>
+
+      <ng-container *ngIf="!submitReceiptSuccess(); else receiptSuccessBlock">
+        <form class="checkout-form" (ngSubmit)="submitReceipt()" #receiptForm="ngForm">
+          <div class="form-row">
+            <div class="form-group">
+              <label>Mã phiếu *</label>
+              <input type="text" [(ngModel)]="receiptData.code" name="code" maxlength="20" required />
+            </div>
+            <div class="form-group">
+              <label>Nhà cung cấp *</label>
+              <select [(ngModel)]="receiptData.supplierId" name="supplierId" required>
+                <option value="">-- Chọn nhà cung cấp --</option>
+                <option *ngFor="let s of suppliers()" [value]="s.id">{{ s.label }} ({{ s.code }})</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Ngày nhập *</label>
+              <input type="datetime-local" [(ngModel)]="receiptData.receivedDate" name="receivedDate" required />
+            </div>
+            <div class="form-group">
+              <label>Trạng thái</label>
+              <select [(ngModel)]="receiptData.receiptStatus" name="receiptStatus">
+                <option value="draft">Draft</option>
+                <option value="confirmed">Confirmed</option>
+                <option value="completed">Completed</option>
+                <option value="canceled">Canceled</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Giá nhập (VND)</label>
+              <input type="number" [(ngModel)]="receiptData.unitCost" name="unitCost" min="1" />
+            </div>
+            <div class="form-group">
+              <label>Ghi chú</label>
+              <input type="text" [(ngModel)]="receiptData.record" name="record" maxlength="500" />
+            </div>
+          </div>
+
+          <div class="form-group full-width">
+            <label>Serial numbers * (mỗi dòng 1 serial, cần đủ {{ selectedReceiptItem()!.quantity }})</label>
+            <textarea [(ngModel)]="receiptData.serialNumbers" name="serialNumbers" rows="4"
+              [placeholder]="'SN001\nSN002\n...'" required></textarea>
+          </div>
+
+          <div *ngIf="submitReceiptError()" class="submit-error">⚠ {{ submitReceiptError() }}</div>
+
+          <div class="modal-actions">
+            <button type="button" class="cancel-btn" (click)="closeReceiptModal()">Hủy</button>
+            <button type="submit" class="submit-btn receipt-submit-btn" [disabled]="submittingReceipt() || receiptForm.invalid">
+              {{ submittingReceipt() ? 'Đang xử lý...' : 'Tạo phiếu nhập kho' }}
+            </button>
+          </div>
+        </form>
+      </ng-container>
+
+      <ng-template #receiptSuccessBlock>
+        <div class="submit-success">✓ Tạo phiếu nhập kho thành công!</div>
+
+        <ng-container *ngIf="grnResponse() as grn">
+          <div class="gdn-grid">
+            <div class="gdn-field"><span>ID</span><strong>{{ grn.id }}</strong></div>
+            <div class="gdn-field"><span>Mã phiếu</span><strong>{{ grn.code }}</strong></div>
+            <div class="gdn-field"><span>Nhà cung cấp ID</span><strong>{{ grn.supplier_id }}</strong></div>
+            <div class="gdn-field"><span>Nhân viên ID</span><strong>{{ grn.employee_id }}</strong></div>
+            <div class="gdn-field"><span>Ngày nhập</span><strong>{{ grn.received_date | date:'dd/MM/yyyy HH:mm' }}</strong></div>
+            <div class="gdn-field"><span>Trạng thái</span><strong>{{ grn.receipt_status }}</strong></div>
+          </div>
+
+          <table class="gdn-items-table">
+            <thead>
+              <tr>
+                <th>Sản phẩm ID</th>
+                <th>Giá nhập</th>
+                <th>Số lượng</th>
+                <th>Serial numbers</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let item of grn.items">
+                <td>{{ item.product_id }}</td>
+                <td>{{ item.unit_cost | number:'1.0-0' }} ₫</td>
+                <td>{{ item.quantity }}</td>
+                <td>{{ item.serial_numbers?.join(', ') || '—' }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </ng-container>
+
+        <div class="modal-actions">
+          <button type="button" class="submit-btn" (click)="closeReceiptModal()">Đóng</button>
+        </div>
+      </ng-template>
+    </div>
+  </div>
+
+  <!-- New Product Modal -->
+  <div class="modal-overlay" *ngIf="showProductModal()" (click)="closeProductModal()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <div>
+          <div class="modal-title">➕ Thêm sản phẩm mới</div>
+        </div>
+        <button class="modal-close" (click)="closeProductModal()">✕</button>
+      </div>
+
+      <ng-container *ngIf="!submitProductSuccess(); else productSuccessBlock">
+        <form class="checkout-form" (ngSubmit)="submitProduct()" #productForm="ngForm">
+          <div class="form-row">
+            <div class="form-group">
+              <label>Tên sản phẩm *</label>
+              <input type="text" [(ngModel)]="productData.label" name="label" maxlength="50" required />
+            </div>
+            <div class="form-group">
+              <label>Mã sản phẩm *</label>
+              <input type="text" [(ngModel)]="productData.code" name="code" maxlength="20" required />
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Danh mục *</label>
+              <select [(ngModel)]="productData.productTypeId" name="productTypeId" required (ngModelChange)="onProductTypeChange()">
+                <option value="">-- Chọn danh mục --</option>
+                <option *ngFor="let t of PRODUCT_TYPES" [value]="t.id">{{ t.label }}</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Thương hiệu *</label>
+              <select [(ngModel)]="productData.brandId" name="brandId" required [attr.disabled]="!productData.productTypeId ? '' : null">
+                <option value="">-- Chọn thương hiệu --</option>
+                <option *ngFor="let b of newProductBrands()" [value]="b.id">{{ b.label }}</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Model</label>
+              <input type="text" [(ngModel)]="productData.model" name="model" maxlength="200" />
+            </div>
+            <div class="form-group">
+              <label>Giá (VND)</label>
+              <input type="number" [(ngModel)]="productData.price" name="price" min="0" />
+            </div>
+          </div>
+
+          <div class="form-group full-width">
+            <label>Ghi chú</label>
+            <textarea [(ngModel)]="productData.notes" name="notes" rows="2" maxlength="500"></textarea>
+          </div>
+
+          <div *ngIf="submitProductError()" class="submit-error">⚠ {{ submitProductError() }}</div>
+
+          <div class="modal-actions">
+            <button type="button" class="cancel-btn" (click)="closeProductModal()">Hủy</button>
+            <button type="submit" class="submit-btn" [disabled]="submittingProduct() || productForm.invalid">
+              {{ submittingProduct() ? 'Đang tạo...' : 'Tạo sản phẩm' }}
+            </button>
+          </div>
+        </form>
+      </ng-container>
+
+      <ng-template #productSuccessBlock>
+        <div class="submit-success">✓ Tạo sản phẩm thành công!</div>
+        <div class="modal-actions">
+          <button type="button" class="submit-btn" (click)="closeProductModal()">Đóng</button>
         </div>
       </ng-template>
     </div>

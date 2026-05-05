@@ -74,6 +74,28 @@
   color: #fff;
 }
 
+.add-product-btn {
+  margin-left: auto;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: none;
+  background: #1565c0;
+  color: #fff;
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: background 0.15s;
+}
+
+.add-product-btn:hover {
+  background: #0d47a1;
+}
+
 /* Checkout panel */
 .checkout-panel {
   margin-top: 32px;
@@ -286,6 +308,14 @@
 }
 
 .cancel-btn:hover { background: #f5f5f5; }
+
+.receipt-submit-btn {
+  background: #2e7d32 !important;
+}
+
+.receipt-submit-btn:hover:not(:disabled) {
+  background: #1b5e20 !important;
+}
 
 /* GDN Response */
 .gdn-response {

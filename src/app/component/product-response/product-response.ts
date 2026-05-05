@@ -30,6 +30,11 @@ export interface OpenFormEvent {
   inventoryIds: number[];
 }
 
+export interface OpenReceiptFormEvent {
+  product: Product;
+  quantity: number;
+}
+
 @Component({
   standalone: true,
   selector: 'app-product-response',
@@ -45,6 +50,7 @@ export class ProductResponse implements OnChanges {
   @Input() error: string | null = null;
   @Input() response: ProductPageResponse | null = null;
   @Output() openForm = new EventEmitter<OpenFormEvent>();
+  @Output() openReceiptForm = new EventEmitter<OpenReceiptFormEvent>();
 
   stockMap: Record<number, number> = {};
   quantityMap: Record<number, number> = {};
@@ -118,5 +124,11 @@ export class ProductResponse implements OnChanges {
     if (quantity <= 0) return;
     const inventoryIds = (this.inventoryIdsMap[item.id] ?? []).slice(0, quantity);
     this.openForm.emit({ product: item, quantity, inventoryIds });
+  }
+
+  onCreateReceipt(item: Product): void {
+    const quantity = this.quantityMap[item.id] ?? 0;
+    if (quantity <= 0) return;
+    this.openReceiptForm.emit({ product: item, quantity });
   }
 }
