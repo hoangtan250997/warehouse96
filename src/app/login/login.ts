@@ -44,7 +44,11 @@ export class LoginPage {
         this.authService.setToken(data.access_token, data.token_type);
         this.router.navigateByUrl('/');
       },
-      error: (err) => this.loginError.set('Login failed: ' + (err?.message ?? err)),
+      error: (err) => {
+        this.loginError.set('Login failed: ' + (err?.error?.detail ?? err?.message ?? 'Invalid credentials'));
+        this.loginForm.reset();
+        this.loginLoading.set(false);
+      },
       complete: () => this.loginLoading.set(false),
     });
   }

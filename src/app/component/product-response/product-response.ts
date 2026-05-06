@@ -102,10 +102,7 @@ export class ProductResponse implements OnChanges {
 
   increment(id: number): void {
     const current = this.quantityMap[id] ?? 0;
-    const stock = this.stockMap[id] ?? 0;
-    if (current < stock) {
-      this.quantityMap = { ...this.quantityMap, [id]: current + 1 };
-    }
+    this.quantityMap = { ...this.quantityMap, [id]: current + 1 };
   }
 
   decrement(id: number): void {
@@ -127,8 +124,7 @@ export class ProductResponse implements OnChanges {
   }
 
   onCreateReceipt(item: Product): void {
-    const quantity = this.quantityMap[item.id] ?? 0;
-    if (quantity <= 0) return;
+    const quantity = Math.max(this.quantityMap[item.id] ?? 0, 1);
     this.openReceiptForm.emit({ product: item, quantity });
   }
 }

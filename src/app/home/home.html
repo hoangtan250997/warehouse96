@@ -65,12 +65,12 @@
             <div class="form-group">
               <label>Trạng thái</label>
               <select [(ngModel)]="form.deliveryStatus" name="deliveryStatus">
-                <option value="draft">Draft</option>
-                <option value="confirmed">Confirmed</option>
-                <option value="shipped">Shipped</option>
-                <option value="received">Received</option>
-                <option value="completed">Completed</option>
-                <option value="canceled">Canceled</option>
+                <option value="DRAFT">Draft</option>
+                <option value="CONFIRMED">Confirmed</option>
+                <option value="SHIPPED">Shipped</option>
+                <option value="RECEIVED">Received</option>
+                <option value="COMPLETED">Completed</option>
+                <option value="CANCELED">Canceled</option>
               </select>
             </div>
           </div>
@@ -183,10 +183,11 @@
             <div class="form-group">
               <label>Trạng thái</label>
               <select [(ngModel)]="receiptData.receiptStatus" name="receiptStatus">
-                <option value="draft">Draft</option>
-                <option value="confirmed">Confirmed</option>
-                <option value="completed">Completed</option>
-                <option value="canceled">Canceled</option>
+                <option value="DRAFT">Draft</option>
+                <option value="CONFIRMED">Confirmed</option>
+                <option value="COMPLETED">Completed</option>
+                <option value="AVAILABLE">Available</option>
+                <option value="CANCELED">Canceled</option>
               </select>
             </div>
           </div>

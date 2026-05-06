@@ -78,7 +78,7 @@ export class HomePage implements OnInit {
     code: '',
     supplierId: '',
     receivedDate: this.nowForInput(),
-    receiptStatus: 'confirmed',
+    receiptStatus: 'CONFIRMED',
     record: '',
     unitCost: null as number | null,
     serialNumbers: '',
@@ -94,7 +94,7 @@ export class HomePage implements OnInit {
     code: '',
     customerId: '',
     deliveryDate: this.nowForInput(),
-    deliveryStatus: 'confirmed',
+    deliveryStatus: 'CONFIRMED',
     discountAmount: null as number | null,
     discountPercent: null as number | null,
     record: '',
@@ -175,7 +175,7 @@ export class HomePage implements OnInit {
     this.submitError.set(null);
     this.submitSuccess.set(false);
     this.gdnResponse.set(null);
-    this.form = { code: '', customerId: '', deliveryDate: this.nowForInput(), deliveryStatus: 'confirmed', discountAmount: null, discountPercent: null, record: '' };
+    this.form = { code: '', customerId: '', deliveryDate: this.nowForInput(), deliveryStatus: 'CONFIRMED', discountAmount: null, discountPercent: null, record: '' };
   }
 
   onOpenReceiptForm(event: OpenReceiptFormEvent): void {
