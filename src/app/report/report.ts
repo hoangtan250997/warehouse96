@@ -4,11 +4,12 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ProductService } from '../service/product.service';
 import { AuthService } from '../service/auth.service';
+import { PieChartComponent } from '../component/pie-chart/pie-chart';
 
 @Component({
   standalone: true,
   selector: 'app-report',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, PieChartComponent],
   templateUrl: './report.html',
   styleUrls: ['./report.css'],
 })
@@ -83,6 +84,24 @@ export class ReportPage implements OnInit {
     return Array.isArray(val);
   }
 
+  isStringArray(val: any): boolean {
+    return Array.isArray(val) && val.length > 0 && typeof val[0] === 'string';
+  }
+
+  private readonly PIE_OBJECT_KEYS = new Set(['brands', 'categories']);
+
+  isPieObjectKey(key: string): boolean {
+    return this.PIE_OBJECT_KEYS.has(key);
+  }
+
+  pluck(arr: any[], field: string): string[] {
+    return arr.map(item => item[field] ?? '');
+  }
+
+  pluckNum(arr: any[], field: string): number[] {
+    return arr.map(item => Number(item[field]) || 0);
+  }
+
   formatLabel(key: string): string {
     const map: Record<string, string> = {
       month: 'Tháng',
@@ -103,6 +122,20 @@ export class ReportPage implements OnInit {
       quantity: 'Số lượng',
       revenue: 'Doanh thu',
       cost: 'Chi phí',
+      receipts: 'Phiếu nhập',
+      deliveries: 'Phiếu xuất',
+      total_count: 'Tổng số phiếu',
+      total_value: 'Tổng giá trị',
+      daily: 'Theo ngày',
+      date: 'Ngày',
+      count: 'Số phiếu',
+      total_products: 'Tổng sản phẩm',
+      total_brands: 'Tổng thương hiệu',
+      total_categories: 'Tổng danh mục',
+      brands: 'Cơ cấu thương hiệu',
+      categories: 'Cơ cấu danh mục',
+      name: 'Tên',
+      product_count: 'Số sản phẩm',
     };
     return map[key] ?? key.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
   }

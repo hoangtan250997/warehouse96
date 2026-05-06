@@ -51,8 +51,25 @@
     <!-- Sub-sections for nested objects/arrays -->
     <ng-container *ngFor="let key of objectKeys(data)">
 
-      <!-- Array of objects → table -->
-      <div class="report-section" *ngIf="isArray(data[key]) && data[key].length > 0">
+      <!-- Array of strings → tag chips -->
+      <div class="report-section" *ngIf="isArray(data[key]) && data[key].length > 0 && isStringArray(data[key])">
+        <h3 class="section-title">{{ formatLabel(key) }}</h3>
+        <div class="tag-list">
+          <span class="tag" *ngFor="let item of data[key]">{{ item }}</span>
+        </div>
+      </div>
+
+      <!-- brands / categories → weighted pie chart -->
+      <div class="report-section" *ngIf="isArray(data[key]) && data[key].length > 0 && !isStringArray(data[key]) && isPieObjectKey(key)">
+        <h3 class="section-title">{{ formatLabel(key) }}</h3>
+        <app-pie-chart
+          [labels]="pluck(data[key], 'name')"
+          [values]="pluckNum(data[key], 'product_count')">
+        </app-pie-chart>
+      </div>
+
+      <!-- Array of objects (other) → table -->
+      <div class="report-section" *ngIf="isArray(data[key]) && data[key].length > 0 && !isStringArray(data[key]) && !isPieObjectKey(key)">
         <h3 class="section-title">{{ formatLabel(key) }}</h3>
         <table class="report-table">
           <thead>
@@ -68,7 +85,7 @@
         </table>
       </div>
 
-      <!-- Nested object → key-value list -->
+      <!-- Nested object → key-value list + nested arrays -->
       <div class="report-section" *ngIf="isObject(data[key])">
         <h3 class="section-title">{{ formatLabel(key) }}</h3>
         <div class="kv-grid">
@@ -79,6 +96,24 @@
             </div>
           </ng-container>
         </div>
+        <!-- nested arrays inside object (e.g. daily breakdown) -->
+        <ng-container *ngFor="let subKey of objectKeys(data[key])">
+          <ng-container *ngIf="isArray(data[key][subKey]) && data[key][subKey].length > 0 && !isStringArray(data[key][subKey])">
+            <h4 class="sub-section-title">{{ formatLabel(subKey) }}</h4>
+            <table class="report-table">
+              <thead>
+                <tr>
+                  <th *ngFor="let col of objectKeys(data[key][subKey][0])">{{ formatLabel(col) }}</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let row of data[key][subKey]">
+                  <td *ngFor="let col of objectKeys(data[key][subKey][0])">{{ formatValue(row[col], col) }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </ng-container>
+        </ng-container>
       </div>
 
     </ng-container>
