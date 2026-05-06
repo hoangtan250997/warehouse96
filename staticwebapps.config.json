@@ -1,0 +1,62 @@
+{
+  "routes": [
+    {
+      "route": "/*",
+      "serve": "/index.html",
+      "statusCode": 200
+    },
+    {
+      "route": "*.json",
+      "serve": null,
+      "statusCode": 404
+    },
+    {
+      "route": "*.jpeg",
+      "serve": null,
+      "statusCode": 404
+    },
+    {
+      "route": "*.jpg",
+      "serve": null,
+      "statusCode": 404
+    },
+    {
+      "route": "*.gif",
+      "serve": null,
+      "statusCode": 404
+    },
+    {
+      "route": "*.png",
+      "serve": null,
+      "statusCode": 404
+    },
+    {
+      "route": "*.ico",
+      "serve": null,
+      "statusCode": 404
+    },
+    {
+      "route": "*.svg",
+      "serve": null,
+      "statusCode": 404
+    },
+    {
+      "route": "*.css",
+      "serve": null,
+      "statusCode": 404
+    },
+    {
+      "route": "*.js",
+      "serve": null,
+      "statusCode": 404
+    }
+  ],
+  "navigationFallback": {
+    "rewrite": "/index.html",
+    "exclude": ["/images/*.{png,jpg,gif,svg}", "/css/*"]
+  },
+  "mimeTypes": {
+    ".json": "text/json",
+    ".wasm": "application/wasm"
+  }
+}
