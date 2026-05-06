@@ -41,7 +41,7 @@ export class LoginPage {
 
     this.authService.login(payload).subscribe({
       next: (data) => {
-        this.authService.setToken(data.access_token, data.token_type);
+        this.authService.setToken(data.access_token, data.token_type, payload.username);
         this.router.navigateByUrl('/');
       },
       error: (err) => {

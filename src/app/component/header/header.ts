@@ -18,6 +18,10 @@ export class Header {
     return this.authService.isLoggedIn();
   }
 
+  getUsername(): string | null {
+    return this.authService.getUsername();
+  }
+
   logout(): void {
     this.authService.logout();
     this.router.navigate(['/login']);

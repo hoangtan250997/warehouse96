@@ -18,6 +18,7 @@
         <div>Register</div>
       </div>
       <div class="user-text" *ngIf="isLoggedIn()">
+        <div>Xin chào, <strong>{{ getUsername() }}</strong></div>
         <div class="logout-btn" (click)="logout()">Logout</div>
       </div>
     </div>

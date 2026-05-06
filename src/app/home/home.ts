@@ -252,6 +252,7 @@ export class HomePage implements OnInit {
         this.submitting.set(false);
         this.submitSuccess.set(true);
         this.gdnResponse.set(res);
+        this.productState.loadPhones(this.productState.selectedBrandId() ?? undefined);
       },
       error: (err: any) => {
         this.submitting.set(false);
@@ -299,6 +300,7 @@ export class HomePage implements OnInit {
         this.submittingReceipt.set(false);
         this.submitReceiptSuccess.set(true);
         this.grnResponse.set(res);
+        this.productState.loadPhones(this.productState.selectedBrandId() ?? undefined);
       },
       error: (err: any) => {
         this.submittingReceipt.set(false);

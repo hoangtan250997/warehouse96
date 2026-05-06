@@ -22,6 +22,7 @@ export class AuthService {
   private readonly http = inject(HttpClient);
   private readonly tokenKey = 'warehousefe.accessToken';
   private readonly typeKey = 'warehousefe.tokenType';
+  private readonly usernameKey = 'warehousefe.username';
 
   login(credentials: LoginRequest): Observable<LoginResponse> {
     const body = new HttpParams()
@@ -35,9 +36,14 @@ export class AuthService {
     return this.http.post<LoginResponse>(LOGIN_API_URL, body.toString(), { headers });
   }
 
-  setToken(token: string, tokenType: string): void {
+  setToken(token: string, tokenType: string, username?: string): void {
     localStorage.setItem(this.tokenKey, token);
     localStorage.setItem(this.typeKey, tokenType);
+    if (username) localStorage.setItem(this.usernameKey, username);
+  }
+
+  getUsername(): string | null {
+    return localStorage.getItem(this.usernameKey);
   }
 
   getAccessToken(): string | null {
@@ -60,5 +66,6 @@ export class AuthService {
   logout(): void {
     localStorage.removeItem(this.tokenKey);
     localStorage.removeItem(this.typeKey);
+    localStorage.removeItem(this.usernameKey);
   }
 }
