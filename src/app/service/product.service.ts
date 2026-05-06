@@ -1,15 +1,17 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
 
-const PHONE_PRODUCTS_API_URL = '/api/v1/products';
-const PHONE_BRANDS_API_URL = '/api/v1/products/brands';
-const CURRENT_STOCK_API_URL = '/api/v1/inventory/current-stock';
-const INVENTORY_API_URL = '/api/v1/inventory';
-const CUSTOMERS_API_URL = '/api/v1/customers';
-const SUPPLIERS_API_URL = '/api/v1/suppliers';
-const GDN_API_URL = '/api/v1/goods-delivery-notes';
-const GRN_API_URL = '/api/v1/goods-receipt-notes';
+const BASE = environment.apiBaseUrl;
+const PHONE_PRODUCTS_API_URL = `${BASE}/api/v1/products`;
+const PHONE_BRANDS_API_URL = `${BASE}/api/v1/products/brands`;
+const CURRENT_STOCK_API_URL = `${BASE}/api/v1/inventory/current-stock`;
+const INVENTORY_API_URL = `${BASE}/api/v1/inventory`;
+const CUSTOMERS_API_URL = `${BASE}/api/v1/customers`;
+const SUPPLIERS_API_URL = `${BASE}/api/v1/suppliers`;
+const GDN_API_URL = `${BASE}/api/v1/goods-delivery-notes`;
+const GRN_API_URL = `${BASE}/api/v1/goods-receipt-notes`;
 
 @Injectable({
   providedIn: 'root',

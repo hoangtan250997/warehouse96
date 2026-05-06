@@ -1,8 +1,9 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
 
-const LOGIN_API_URL = '/api/v1/auth/login';
+const LOGIN_API_URL = `${environment.apiBaseUrl}/api/v1/auth/login`;
 
 export interface LoginRequest {
   username: string;
