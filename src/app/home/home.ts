@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ProductStateService } from '../service/product-state.service';
 import { ProductService } from '../service/product.service';
+import { AuthService } from '../service/auth.service';
 import { ProductResponse, OpenFormEvent, OpenReceiptFormEvent } from '../component/product-response/product-response';
 
 interface Customer {
@@ -27,6 +28,23 @@ interface Supplier {
 export class HomePage implements OnInit {
   readonly productState = inject(ProductStateService);
   private readonly productService = inject(ProductService);
+  private readonly authService = inject(AuthService);
+
+  get userRole(): string | null {
+    return this.authService.getRole();
+  }
+
+  canCreateGDN(): boolean {
+    return this.userRole === 'SALES' || this.userRole === 'MANAGER';
+  }
+
+  canCreateGRN(): boolean {
+    return this.userRole === 'WAREHOUSE_STAFF' || this.userRole === 'MANAGER';
+  }
+
+  canAddProduct(): boolean {
+    return this.userRole === 'ACCOUNTANT' || this.userRole === 'MANAGER';
+  }
 
   readonly customers = signal<Customer[]>([]);
   readonly suppliers = signal<Supplier[]>([]);
@@ -75,7 +93,7 @@ export class HomePage implements OnInit {
   };
 
   receiptData = {
-    code: '',
+    code: this.generateReceiptCode(),
     supplierId: '',
     receivedDate: this.nowForInput(),
     receiptStatus: 'CONFIRMED',
@@ -83,6 +101,18 @@ export class HomePage implements OnInit {
     unitCost: null as number | null,
     serialNumbers: '',
   };
+
+  private generateReceiptCode(): string {
+    const now = new Date();
+    const pad = (n: number) => n.toString().padStart(2, '0');
+    return `GRN-${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}`;
+  }
+
+  private generateDeliveryCode(): string {
+    const now = new Date();
+    const pad = (n: number) => n.toString().padStart(2, '0');
+    return `GDN-${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}`;
+  }
 
   private nowForInput(): string {
     const now = new Date();
@@ -175,7 +205,7 @@ export class HomePage implements OnInit {
     this.submitError.set(null);
     this.submitSuccess.set(false);
     this.gdnResponse.set(null);
-    this.form = { code: '', customerId: '', deliveryDate: this.nowForInput(), deliveryStatus: 'CONFIRMED', discountAmount: null, discountPercent: null, record: '' };
+    this.form = { code: this.generateDeliveryCode(), customerId: '', deliveryDate: this.nowForInput(), deliveryStatus: 'CONFIRMED', discountAmount: null, discountPercent: null, record: '' };
   }
 
   onOpenReceiptForm(event: OpenReceiptFormEvent): void {
@@ -183,7 +213,7 @@ export class HomePage implements OnInit {
     this.submitReceiptError.set(null);
     this.submitReceiptSuccess.set(false);
     this.grnResponse.set(null);
-    this.receiptData = { code: '', supplierId: '', receivedDate: this.nowForInput(), receiptStatus: 'confirmed', record: '', unitCost: null, serialNumbers: '' };
+    this.receiptData = { code: this.generateReceiptCode(), supplierId: '', receivedDate: this.nowForInput(), receiptStatus: 'confirmed', record: '', unitCost: null, serialNumbers: '' };
   }
 
   closeReceiptModal(): void {

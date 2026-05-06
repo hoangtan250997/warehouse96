@@ -1,0 +1,89 @@
+<div class="report-page">
+  <!-- Header bar -->
+  <div class="report-topbar no-print">
+    <button class="back-btn" (click)="goHome()">← Trang chủ</button>
+    <h1 class="report-title">📊 Báo cáo xuất nhập kho</h1>
+    <button class="pdf-btn" (click)="exportPdf()">🖨️ Xuất PDF</button>
+  </div>
+
+  <!-- Filter -->
+  <div class="report-filter no-print">
+    <label>Tháng:</label>
+    <select [(ngModel)]="selectedMonth">
+      <option *ngFor="let m of months" [value]="m.value">{{ m.label }}</option>
+    </select>
+
+    <label>Năm:</label>
+    <select [(ngModel)]="selectedYear">
+      <option *ngFor="let y of years" [value]="y">{{ y }}</option>
+    </select>
+
+    <button class="fetch-btn" (click)="fetchReport()" [disabled]="loading()">
+      {{ loading() ? 'Đang tải...' : '🔍 Xem báo cáo' }}
+    </button>
+  </div>
+
+  <!-- Loading -->
+  <div class="report-loading no-print" *ngIf="loading()">Đang tải dữ liệu...</div>
+
+  <!-- Error -->
+  <div class="report-error no-print" *ngIf="error()">⚠ {{ error() }}</div>
+
+  <!-- Report content -->
+  <div class="report-content" *ngIf="report() as data">
+
+    <!-- Print header (only shows when printing) -->
+    <div class="print-header print-only">
+      <h2>BÁO CÁO XUẤT NHẬP KHO</h2>
+      <p>Tháng {{ selectedMonth }} / {{ selectedYear }}</p>
+    </div>
+
+    <!-- Summary cards for scalar values -->
+    <div class="summary-cards" *ngIf="objectKeys(data).length > 0">
+      <ng-container *ngFor="let key of objectKeys(data)">
+        <div class="summary-card" *ngIf="!isObject(data[key]) && !isArray(data[key])">
+          <div class="card-label">{{ formatLabel(key) }}</div>
+          <div class="card-value">{{ formatValue(data[key], key) }}</div>
+        </div>
+      </ng-container>
+    </div>
+
+    <!-- Sub-sections for nested objects/arrays -->
+    <ng-container *ngFor="let key of objectKeys(data)">
+
+      <!-- Array of objects → table -->
+      <div class="report-section" *ngIf="isArray(data[key]) && data[key].length > 0">
+        <h3 class="section-title">{{ formatLabel(key) }}</h3>
+        <table class="report-table">
+          <thead>
+            <tr>
+              <th *ngFor="let col of objectKeys(data[key][0])">{{ formatLabel(col) }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let row of data[key]">
+              <td *ngFor="let col of objectKeys(data[key][0])">{{ formatValue(row[col], col) }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Nested object → key-value list -->
+      <div class="report-section" *ngIf="isObject(data[key])">
+        <h3 class="section-title">{{ formatLabel(key) }}</h3>
+        <div class="kv-grid">
+          <ng-container *ngFor="let subKey of objectKeys(data[key])">
+            <div class="kv-row" *ngIf="!isObject(data[key][subKey]) && !isArray(data[key][subKey])">
+              <span class="kv-label">{{ formatLabel(subKey) }}</span>
+              <span class="kv-value">{{ formatValue(data[key][subKey], subKey) }}</span>
+            </div>
+          </ng-container>
+        </div>
+      </div>
+
+    </ng-container>
+
+    <!-- Empty message -->
+    <div class="empty-msg" *ngIf="objectKeys(data).length === 0">Không có dữ liệu cho kỳ này.</div>
+  </div>
+</div>

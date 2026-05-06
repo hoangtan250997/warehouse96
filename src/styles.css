@@ -18,6 +18,14 @@ html, body {
   color: #333;
 }
 
+@media print {
+  app-header,
+  app-navbar,
+  .secondary-nav {
+    display: none !important;
+  }
+}
+
 ::-webkit-scrollbar {
   width: 8px;
 }

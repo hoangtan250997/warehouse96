@@ -12,6 +12,7 @@ const CUSTOMERS_API_URL = `${BASE}/api/v1/customers`;
 const SUPPLIERS_API_URL = `${BASE}/api/v1/suppliers`;
 const GDN_API_URL = `${BASE}/api/v1/goods-delivery-notes`;
 const GRN_API_URL = `${BASE}/api/v1/goods-receipt-notes`;
+const REPORTS_API_URL = `${BASE}/api/v1/reports`;
 
 @Injectable({
   providedIn: 'root',
@@ -67,5 +68,12 @@ export class ProductService {
 
   createProduct(body: any): Observable<any> {
     return this.http.post<any>(PHONE_PRODUCTS_API_URL, body);
+  }
+
+  fetchMonthlyReport(month: number, year: number): Observable<any> {
+    const params = new HttpParams()
+      .set('month', month)
+      .set('year', year);
+    return this.http.get<any>(`${REPORTS_API_URL}/monthly`, { params });
   }
 }

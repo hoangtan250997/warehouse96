@@ -49,6 +49,7 @@ export class ProductResponse implements OnChanges {
   @Input() loading: boolean = false;
   @Input() error: string | null = null;
   @Input() response: ProductPageResponse | null = null;
+  @Input() role: string | null = null;
   @Output() openForm = new EventEmitter<OpenFormEvent>();
   @Output() openReceiptForm = new EventEmitter<OpenReceiptFormEvent>();
 

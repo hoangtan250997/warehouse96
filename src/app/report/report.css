@@ -1,0 +1,281 @@
+.report-page {
+  min-height: 100vh;
+  background: #f4f6fa;
+  padding: 0 0 40px 0;
+}
+
+.report-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #fff;
+  padding: 14px 30px;
+  border-bottom: 1px solid #e9ecef;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+}
+
+.report-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #1a1a2e;
+  margin: 0;
+}
+
+.back-btn {
+  background: #f0f0f0;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  color: #333;
+  transition: background 0.2s;
+}
+.back-btn:hover { background: #e0e0e0; }
+
+.pdf-btn {
+  background: #e53935;
+  color: #fff;
+  border: none;
+  padding: 8px 18px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  transition: background 0.2s;
+}
+.pdf-btn:hover { background: #c62828; }
+
+.report-filter {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 18px 30px;
+  background: #fff;
+  border-bottom: 1px solid #eee;
+  flex-wrap: wrap;
+}
+
+.report-filter label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #555;
+}
+
+.report-filter select {
+  padding: 7px 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 14px;
+  outline: none;
+}
+
+.fetch-btn {
+  background: #0099ff;
+  color: #fff;
+  border: none;
+  padding: 8px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  transition: background 0.2s;
+}
+.fetch-btn:hover:not(:disabled) { background: #007acc; }
+.fetch-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+.report-loading, .report-error, .empty-msg {
+  text-align: center;
+  padding: 40px;
+  font-size: 16px;
+  color: #888;
+}
+.report-error { color: #e53935; }
+
+.report-content {
+  padding: 24px 30px;
+}
+
+.summary-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 16px;
+  margin-bottom: 28px;
+}
+
+.summary-card {
+  background: #fff;
+  border-radius: 10px;
+  padding: 18px 20px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+  border-left: 4px solid #0099ff;
+}
+
+.card-label {
+  font-size: 12px;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+}
+
+.card-value {
+  font-size: 22px;
+  font-weight: 700;
+  color: #1a1a2e;
+}
+
+.report-section {
+  background: #fff;
+  border-radius: 10px;
+  padding: 20px 24px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+}
+
+.section-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #1a1a2e;
+  margin: 0 0 16px 0;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #e9ecef;
+}
+
+.report-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+.report-table th {
+  background: #f4f6fa;
+  padding: 10px 14px;
+  text-align: left;
+  font-weight: 600;
+  color: #555;
+  border-bottom: 2px solid #e9ecef;
+}
+.report-table td {
+  padding: 10px 14px;
+  border-bottom: 1px solid #f0f0f0;
+  color: #333;
+}
+.report-table tr:last-child td { border-bottom: none; }
+.report-table tr:hover td { background: #f9fafb; }
+
+.kv-grid { display: flex; flex-direction: column; gap: 8px; }
+.kv-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid #f0f0f0;
+  font-size: 14px;
+}
+.kv-label { color: #666; }
+.kv-value { font-weight: 600; color: #1a1a2e; }
+
+/* Print styles */
+.print-only { display: none; }
+.print-header { text-align: center; margin-bottom: 20px; }
+.print-header h2 { font-size: 22px; font-weight: 700; }
+.print-header p { font-size: 14px; color: #555; }
+
+@page {
+  size: A4 portrait;
+  margin: 18mm 15mm 18mm 15mm;
+}
+
+@media print {
+  .no-print { display: none !important; }
+  .print-only { display: block !important; }
+
+  * { box-sizing: border-box; }
+
+  .report-page { background: #fff; padding: 0; min-height: unset; }
+  .report-content { padding: 0; }
+
+  /* summary cards → wrapped grid */
+  .summary-cards {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 0 !important;
+    margin-bottom: 16px !important;
+    border: 1px solid #999 !important;
+  }
+  .summary-card {
+    flex: 1 1 22% !important;
+    border: none !important;
+    border-right: 1px solid #999 !important;
+    border-bottom: 1px solid #999 !important;
+    padding: 7px 10px !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    border-left: none !important;
+    page-break-inside: avoid;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  .card-label {
+    font-size: 10px !important;
+    font-weight: 600;
+    color: #444 !important;
+    margin-bottom: 4px !important;
+  }
+  .card-value {
+    font-size: 14px !important;
+    font-weight: 700;
+    color: #000 !important;
+  }
+
+  /* each section → bordered table */
+  .report-section {
+    box-shadow: none !important;
+    border: none !important;
+    border-radius: 0 !important;
+    padding: 0 !important;
+    margin-bottom: 16px !important;
+    page-break-inside: avoid;
+  }
+  .section-title {
+    background: #ddd !important;
+    padding: 5px 8px !important;
+    font-size: 13px !important;
+    border: 1px solid #999;
+    border-bottom: none;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* kv-grid → proper table */
+  .kv-grid {
+    display: table !important;
+    width: 100% !important;
+    border-collapse: collapse !important;
+    gap: 0 !important;
+  }
+  .kv-row {
+    display: table-row !important;
+    border: none !important;
+  }
+  .kv-label, .kv-value {
+    display: table-cell !important;
+    border: 1px solid #999 !important;
+    padding: 5px 10px !important;
+    font-size: 12px !important;
+  }
+  .kv-label { width: 45%; background: #f5f5f5 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .kv-value { text-align: right; }
+
+  /* data tables */
+  .report-table th, .report-table td {
+    border: 1px solid #999 !important;
+    font-size: 12px !important;
+    padding: 5px 8px !important;
+  }
+  .report-table th {
+    background: #ddd !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  .report-table tr:last-child td { border-bottom: 1px solid #999 !important; }
+}

@@ -46,6 +46,22 @@ export class AuthService {
     return localStorage.getItem(this.usernameKey);
   }
 
+  decodeToken(): Record<string, any> | null {
+    const token = this.getAccessToken();
+    if (!token) return null;
+    try {
+      const payload = token.split('.')[1];
+      return JSON.parse(atob(payload));
+    } catch {
+      return null;
+    }
+  }
+
+  getRole(): string | null {
+    const payload = this.decodeToken();
+    return payload?.['role'] ?? payload?.['roles'] ?? payload?.['scope'] ?? null;
+  }
+
   getAccessToken(): string | null {
     return localStorage.getItem(this.tokenKey);
   }

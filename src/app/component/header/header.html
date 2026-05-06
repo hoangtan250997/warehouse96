@@ -19,9 +19,12 @@
       </div>
       <div class="user-text" *ngIf="isLoggedIn()">
         <div>Xin chào, <strong>{{ getUsername() }}</strong></div>
+        <div class="role-badge role-{{ getRole()?.toLowerCase() }}">{{ getRoleLabel() }}</div>
         <div class="logout-btn" (click)="logout()">Logout</div>
       </div>
     </div>
+
+    <a *ngIf="isLoggedIn() && getRole() === 'MANAGER'" routerLink="/report" class="report-btn">📊 Báo cáo</a>
 
     <div class="notification">
       <span class="bell-icon">🔔</span>
