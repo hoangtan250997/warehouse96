@@ -2,6 +2,7 @@ import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../service/auth.service';
+import { ProductStateService } from '../../service/product-state.service';
 
 @Component({
   standalone: true,
@@ -13,6 +14,11 @@ import { AuthService } from '../../service/auth.service';
 export class Header {
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
+  readonly productState = inject(ProductStateService);
+
+  onSearch(event: Event): void {
+    this.productState.searchQuery.set((event.target as HTMLInputElement).value);
+  }
 
   isLoggedIn(): boolean {
     return this.authService.isLoggedIn();

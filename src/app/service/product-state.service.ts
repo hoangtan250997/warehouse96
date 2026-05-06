@@ -1,7 +1,8 @@
-import { Injectable, inject, signal } from '@angular/core';
+import { Injectable, inject, signal, computed } from '@angular/core';
 import { Router } from '@angular/router';
 import { ProductService } from './product.service';
 import { ProductPageResponse } from '../component/product-response/product-response';
+import { extractHttpError } from './http-error.util';
 
 export interface Brand {
   id: number;
@@ -25,6 +26,14 @@ export class ProductStateService {
   readonly brands = signal<Brand[]>([]);
   readonly selectedBrandId = signal<number | null>(null);
   readonly currentProductTypeId = signal<number | null>(null);
+  readonly searchQuery = signal<string>('');
+
+  readonly filteredResponse = computed(() => {
+    const res = this.response();
+    const q = this.searchQuery().trim().toLowerCase();
+    if (!res || !q) return res;
+    return { ...res, items: res.items.filter(p => p.label.toLowerCase().includes(q)) };
+  });
 
   private handleError(err: any, errorSignal: (msg: string) => void, loadingSignal: () => void): void {
     loadingSignal();
@@ -32,7 +41,7 @@ export class ProductStateService {
       this.router.navigate(['/login']);
       return;
     }
-    errorSignal(err?.error?.detail ?? err?.message ?? 'Unknown error');
+    errorSignal(extractHttpError(err, 'Unknown error'));
   }
 
   loadPhones(brandId?: number): void {

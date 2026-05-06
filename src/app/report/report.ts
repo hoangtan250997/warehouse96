@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 import { ProductService } from '../service/product.service';
 import { AuthService } from '../service/auth.service';
 import { PieChartComponent } from '../component/pie-chart/pie-chart';
+import { extractHttpError } from '../service/http-error.util';
 
 @Component({
   standalone: true,
@@ -55,7 +56,7 @@ export class ReportPage implements OnInit {
       },
       error: (err: any) => {
         this.loading.set(false);
-        this.error.set(err?.error?.detail ?? 'Không thể tải báo cáo. Vui lòng thử lại.');
+        this.error.set(extractHttpError(err, 'Không thể tải báo cáo. Vui lòng thử lại.'));
       },
     });
   }

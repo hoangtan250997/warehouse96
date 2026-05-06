@@ -25,7 +25,7 @@
   <app-product-response
     [loading]="productState.loading()"
     [error]="productState.error()"
-    [response]="productState.response()"
+    [response]="productState.filteredResponse()"
     [role]="userRole"
     (openForm)="onOpenForm($event)"
     (openReceiptForm)="onOpenReceiptForm($event)">

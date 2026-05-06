@@ -20,6 +20,7 @@ app-header {
   left: 0;
   right: 0;
   z-index: 1000;
+  height: var(--header-h);
 }
 
 .secondary-nav {
@@ -62,7 +63,7 @@ app-header {
 app-navbar {
   position: fixed;
   left: 0;
-  top: 78px;
+  top: var(--header-h);
   bottom: 0;
   width: 240px;
   display: block;
@@ -70,12 +71,12 @@ app-navbar {
 
 .content {
   margin-left: 240px;
-  padding: 100px 28px 28px;
-  min-height: calc(100vh - 100px);
+  padding: calc(var(--header-h) + 24px) 28px 28px;
+  min-height: calc(100vh - var(--header-h));
   background-color: #eef2f7;
 }
 
 .content.no-sidebar {
   margin-left: 0;
-  padding: 57px 0 0;
+  padding: var(--header-h) 0 0;
 }

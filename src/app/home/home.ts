@@ -5,6 +5,7 @@ import { ProductStateService } from '../service/product-state.service';
 import { ProductService } from '../service/product.service';
 import { AuthService } from '../service/auth.service';
 import { ProductResponse, OpenFormEvent, OpenReceiptFormEvent } from '../component/product-response/product-response';
+import { extractHttpError } from '../service/http-error.util';
 
 interface Customer {
   id: number;
@@ -195,7 +196,7 @@ export class HomePage implements OnInit {
       },
       error: (err: any) => {
         this.submittingProduct.set(false);
-        this.submitProductError.set(err?.error?.detail ?? JSON.stringify(err?.error) ?? 'Lỗi tạo sản phẩm');
+        this.submitProductError.set(extractHttpError(err, 'Lỗi tạo sản phẩm'));
       },
     });
   }
@@ -286,7 +287,7 @@ export class HomePage implements OnInit {
       },
       error: (err: any) => {
         this.submitting.set(false);
-        this.submitError.set(err?.error?.detail ?? JSON.stringify(err?.error) ?? 'Submission failed');
+        this.submitError.set(extractHttpError(err, 'Tạo phiếu xuất thất bại. Vui lòng thử lại.'));
       },
     });
   }
@@ -334,7 +335,7 @@ export class HomePage implements OnInit {
       },
       error: (err: any) => {
         this.submittingReceipt.set(false);
-        this.submitReceiptError.set(err?.error?.detail ?? JSON.stringify(err?.error) ?? 'Submission failed');
+        this.submitReceiptError.set(extractHttpError(err, 'Tạo phiếu nhập thất bại. Vui lòng thử lại.'));
       },
     });
   }
