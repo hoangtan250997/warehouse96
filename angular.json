@@ -17,7 +17,7 @@
         "build": {
           "builder": "@angular/build:application",
           "options": {
-            "outputPath": "dist",
+            "outputPath": "dist/WarehouseFE",
             "browser": "src/main.ts",
             "tsConfig": "tsconfig.app.json",
             "assets": [
