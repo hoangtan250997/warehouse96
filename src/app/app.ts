@@ -10,8 +10,8 @@ import { CommonModule } from '@angular/common';
   imports: [Header, Navbar, RouterOutlet, CommonModule],
   template: `
     <app-header></app-header>
-    <app-navbar *ngIf="!isLoginPage()"></app-navbar>
-    <main class="content">
+    <app-navbar *ngIf="!isLoginPage() && !isReportPage()"></app-navbar>
+    <main [class]="isLoginPage() || isReportPage() ? 'content no-sidebar' : 'content'">
       <router-outlet></router-outlet>
     </main>
   `,
@@ -24,5 +24,9 @@ export class App {
 
   isLoginPage(): boolean {
     return this.router.url === '/login';
+  }
+
+  isReportPage(): boolean {
+    return this.router.url.startsWith('/report');
   }
 }

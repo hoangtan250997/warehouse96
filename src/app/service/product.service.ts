@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { tap } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 
 const BASE = environment.apiBaseUrl;
@@ -51,11 +52,25 @@ export class ProductService {
   }
 
   fetchCustomers(): Observable<any> {
-    return this.http.get<any>(CUSTOMERS_API_URL);
+    return this.http.get<any>(CUSTOMERS_API_URL).pipe(
+      tap((res: any) => {
+        const items: any[] = res?.items ?? res ?? [];
+        if (items[0]?.label) {
+          console.log('[Customers] first label:', items[0].label, '| char codes:', [...items[0].label].map(c => c.charCodeAt(0).toString(16)));
+        }
+      })
+    );
   }
 
   fetchSuppliers(): Observable<any> {
-    return this.http.get<any>(SUPPLIERS_API_URL);
+    return this.http.get<any>(SUPPLIERS_API_URL).pipe(
+      tap((res: any) => {
+        const items: any[] = res?.items ?? res ?? [];
+        if (items[0]?.label) {
+          console.log('[Suppliers] first label:', items[0].label, '| char codes:', [...items[0].label].map(c => c.charCodeAt(0).toString(16)));
+        }
+      })
+    );
   }
 
   createGoodsDeliveryNote(body: any): Observable<any> {
@@ -74,6 +89,14 @@ export class ProductService {
     const params = new HttpParams()
       .set('month', month)
       .set('year', year);
-    return this.http.get<any>(`${REPORTS_API_URL}/monthly`, { params });
+    return this.http.get<any>(`${REPORTS_API_URL}/monthly`, { params }).pipe(
+      tap(data => {
+        const cats: any[] = data?.categories ?? [];
+        const brands: any[] = data?.brands ?? [];
+        console.log('[Report] categories raw:', JSON.stringify(cats));
+        console.log('[Report] brands raw:', JSON.stringify(brands));
+        console.log('[Report] first category char codes:', cats[0]?.name ? [...cats[0].name].map(c => c.charCodeAt(0).toString(16)) : 'n/a');
+      })
+    );
   }
 }

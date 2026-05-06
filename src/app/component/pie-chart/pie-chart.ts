@@ -1,4 +1,4 @@
-import { Component, Input, OnChanges } from '@angular/core';
+﻿import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 interface Slice {
@@ -6,6 +6,7 @@ interface Slice {
   percentage: number;
   path: string;
   color: string;
+  tooltip: string;
 }
 
 @Component({
@@ -19,14 +20,14 @@ interface Slice {
           *ngFor="let s of slices"
           [attr.d]="s.path"
           [attr.fill]="s.color"
+          [attr.aria-label]="s.tooltip"
           class="pie-slice">
-          <title>{{ s.label }} — {{ s.percentage | number:'1.1-1' }}%</title>
         </path>
         <!-- donut hole -->
         <circle cx="100" cy="100" r="50" fill="#fff" />
       </svg>
       <div class="pie-legend">
-        <div class="legend-item" *ngFor="let s of slices">
+        <div class="legend-item" *ngFor="let s of slices" [title]="s.tooltip">
           <span class="legend-dot" [style.background]="s.color"></span>
           <span class="legend-label">{{ s.label }}</span>
           <span class="legend-pct">{{ s.percentage | number:'1.1-1' }}%</span>
@@ -50,6 +51,7 @@ interface Slice {
       stroke: #fff;
       stroke-width: 1.5;
       transition: opacity 0.15s;
+      cursor: pointer;
     }
     .pie-slice:hover { opacity: 0.82; }
     .pie-legend {
@@ -58,12 +60,14 @@ interface Slice {
       gap: 6px;
       justify-content: center;
       min-width: 140px;
+      font-family: "Segoe UI", system-ui, -apple-system, "Noto Sans", sans-serif;
     }
     .legend-item {
       display: flex;
       align-items: center;
       gap: 8px;
       font-size: 13px;
+      cursor: default;
     }
     .legend-dot {
       width: 12px;
@@ -95,19 +99,25 @@ export class PieChartComponent implements OnChanges {
     '#54a0ff', '#ff6b6b', '#48dbfb', '#1dd1a1', '#feca57',
   ];
 
-  ngOnChanges(): void {
-    this.buildSlices();
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['labels'] || changes['values']) {
+      this.buildSlices();
+    }
   }
 
   private buildSlices(): void {
-    const n = this.labels.length;
+    const rawLabels = this.labels ?? [];
+    const n = rawLabels.length;
     if (!n) { this.slices = []; return; }
 
+    // Normalize Unicode NFC to ensure Vietnamese chars render correctly
+    const labels = rawLabels.map(l => (typeof l === 'string' ? l.normalize('NFC') : String(l)));
+
     const vals = this.values?.length === n ? this.values : Array(n).fill(1);
-    const total = vals.reduce((a, b) => a + b, 0);
+    const total = vals.reduce((a, b) => a + b, 0) || 1;
 
     let currentAngle = -Math.PI / 2;
-    this.slices = this.labels.map((label, i) => {
+    this.slices = labels.map((label, i) => {
       const ratio = vals[i] / total;
       const angle = ratio * 2 * Math.PI;
       const startAngle = currentAngle;
@@ -126,11 +136,13 @@ export class PieChartComponent implements OnChanges {
             return `M ${cx} ${cy} L ${x1} ${y1} A ${r} ${r} 0 ${large} 1 ${x2} ${y2} Z`;
           })();
 
+      const pct = (ratio * 100).toLocaleString('vi-VN', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
       return {
         label,
         percentage: ratio * 100,
         path,
         color: this.COLORS[i % this.COLORS.length],
+        tooltip: `${label}: ${pct}%`,
       };
     });
   }
