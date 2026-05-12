@@ -1,5 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 import { ProductStateService } from '../service/product-state.service';
 
 @Component({
@@ -11,6 +12,7 @@ import { ProductStateService } from '../service/product-state.service';
 })
 export class Navbar {
   private readonly productState = inject(ProductStateService);
+  private readonly router = inject(Router);
 
   loadPhones(): void {
     this.productState.loadPhones();
@@ -18,5 +20,9 @@ export class Navbar {
 
   fetchBrands(productTypeId: number): void {
     this.productState.loadBrands(productTypeId);
+  }
+
+  goToReport(): void {
+    this.router.navigate(['/report']);
   }
 }

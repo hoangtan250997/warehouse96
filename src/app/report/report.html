@@ -1,124 +1,99 @@
-<div class="report-page">
-  <!-- Header bar -->
-  <div class="report-topbar no-print">
-    <button class="back-btn" (click)="goHome()">← Trang chủ</button>
-    <h1 class="report-title">📊 Báo cáo xuất nhập kho</h1>
-    <button class="pdf-btn" (click)="exportPdf()">🖨️ Xuất PDF</button>
+<!-- Toolbar (hidden on print) -->
+<div class="report-toolbar no-print">
+  <button class="btn-back" (click)="goBack()">← Quay lại</button>
+  <button class="btn-print" (click)="exportExcel()">📥 Xuất Excel</button>
+</div>
+
+<!-- Loading / Error -->
+<div *ngIf="loading()" class="report-status no-print">Đang tải dữ liệu...</div>
+<div *ngIf="error()" class="report-error no-print">{{ error() }}</div>
+
+<!-- ─── REPORT DOCUMENT ─────────────────────────────── -->
+<div class="report-document" *ngIf="!loading() && !error()">
+
+  <!-- ① REPORT HEADER (once, top of entire report) -->
+  <div class="report-header">
+    <div class="rh-company">
+      <div class="rh-company-name">CÔNG TY TNHH TEAM96.VN</div>
+      <div class="rh-company-address">123 Đường Lê Lợi, Quận 1, TP. Hồ Chí Minh</div>
+      <div class="rh-company-tax">MST: 0123456789</div>
+    </div>
+    <div class="rh-title-block">
+      <div class="rh-report-title">BÁO CÁO TỒN KHO</div>
+      <div class="rh-report-subtitle">WAREHOUSE INVENTORY REPORT</div>
+    </div>
+    <div class="rh-meta">
+      <div>Ngày in: <strong>{{ reportDate | date:'dd/MM/yyyy HH:mm' }}</strong></div>
+      <div>Người lập: <strong>{{ currentUser }}</strong></div>
+    </div>
   </div>
 
-  <!-- Filter -->
-  <div class="report-filter no-print">
-    <label>Tháng:</label>
-    <select [(ngModel)]="selectedMonth">
-      <option *ngFor="let m of months" [value]="m.value">{{ m.label }}</option>
-    </select>
+  <div class="report-divider"></div>
 
-    <label>Năm:</label>
-    <select [(ngModel)]="selectedYear">
-      <option *ngFor="let y of years" [value]="y">{{ y }}</option>
-    </select>
-
-    <button class="fetch-btn" (click)="fetchReport()" [disabled]="loading()">
-      {{ loading() ? 'Đang tải...' : '🔍 Xem báo cáo' }}
-    </button>
+  <!-- ② PAGE HEADER (repeats on each printed page via CSS) -->
+  <div class="page-header">
+    <span class="ph-company">TEAM96.VN — Báo cáo tồn kho</span>
+    <span class="ph-date">{{ reportDate | date:'dd/MM/yyyy' }}</span>
   </div>
 
-  <!-- Loading -->
-  <div class="report-loading no-print" *ngIf="loading()">Đang tải dữ liệu...</div>
+  <!-- ③ STRUCTURE — column definitions / table header -->
+  <div class="structure-band">
+    <table class="report-table">
+      <thead>
+        <tr>
+          <th class="col-stt">STT</th>
+          <th class="col-code">Mã sản phẩm</th>
+          <th class="col-label">Tên sản phẩm</th>
+          <th class="col-model">Model</th>
+          <th class="col-unit">ĐVT</th>
+          <th class="col-stock">Tồn kho</th>
+          <th class="col-price">Đơn giá</th>
+          <th class="col-total">Thành tiền</th>
+        </tr>
+      </thead>
 
-  <!-- Error -->
-  <div class="report-error no-print" *ngIf="error()">⚠ {{ error() }}</div>
-
-  <!-- Report content -->
-  <div class="report-content" *ngIf="report() as data">
-
-    <!-- Print header (only shows when printing) -->
-    <div class="print-header print-only">
-      <h2>BÁO CÁO XUẤT NHẬP KHO</h2>
-      <p>Tháng {{ selectedMonth }} / {{ selectedYear }}</p>
-    </div>
-
-    <!-- Summary cards for scalar values -->
-    <div class="summary-cards" *ngIf="objectKeys(data).length > 0">
-      <ng-container *ngFor="let key of objectKeys(data)">
-        <div class="summary-card" *ngIf="!isObject(data[key]) && !isArray(data[key])">
-          <div class="card-label">{{ formatLabel(key) }}</div>
-          <div class="card-value">{{ formatValue(data[key], key) }}</div>
-        </div>
-      </ng-container>
-    </div>
-
-    <!-- Sub-sections for nested objects/arrays -->
-    <ng-container *ngFor="let key of objectKeys(data)">
-
-      <!-- Array of strings → tag chips -->
-      <div class="report-section" *ngIf="isArray(data[key]) && data[key].length > 0 && isStringArray(data[key])">
-        <h3 class="section-title">{{ formatLabel(key) }}</h3>
-        <div class="tag-list">
-          <span class="tag" *ngFor="let item of data[key]">{{ item }}</span>
-        </div>
-      </div>
-
-      <!-- brands / categories → weighted pie chart -->
-      <div class="report-section" *ngIf="isArray(data[key]) && data[key].length > 0 && !isStringArray(data[key]) && isPieObjectKey(key)">
-        <h3 class="section-title">{{ formatLabel(key) }}</h3>
-        <app-pie-chart
-          [labels]="pluck(data[key], 'name')"
-          [values]="pluckNum(data[key], 'product_count')">
-        </app-pie-chart>
-      </div>
-
-      <!-- Array of objects (other) → table -->
-      <div class="report-section" *ngIf="isArray(data[key]) && data[key].length > 0 && !isStringArray(data[key]) && !isPieObjectKey(key)">
-        <h3 class="section-title">{{ formatLabel(key) }}</h3>
-        <table class="report-table">
-          <thead>
-            <tr>
-              <th *ngFor="let col of objectKeys(data[key][0])">{{ formatLabel(col) }}</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let row of data[key]">
-              <td *ngFor="let col of objectKeys(data[key][0])">{{ formatValue(row[col], col) }}</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <!-- Nested object → key-value list + nested arrays -->
-      <div class="report-section" *ngIf="isObject(data[key])">
-        <h3 class="section-title">{{ formatLabel(key) }}</h3>
-        <div class="kv-grid">
-          <ng-container *ngFor="let subKey of objectKeys(data[key])">
-            <div class="kv-row" *ngIf="!isObject(data[key][subKey]) && !isArray(data[key][subKey])">
-              <span class="kv-label">{{ formatLabel(subKey) }}</span>
-              <span class="kv-value">{{ formatValue(data[key][subKey], subKey) }}</span>
-            </div>
-          </ng-container>
-        </div>
-        <!-- nested arrays inside object (e.g. daily breakdown) -->
-        <ng-container *ngFor="let subKey of objectKeys(data[key])">
-          <ng-container *ngIf="isArray(data[key][subKey]) && data[key][subKey].length > 0 && !isStringArray(data[key][subKey])">
-            <h4 class="sub-section-title">{{ formatLabel(subKey) }}</h4>
-            <table class="report-table">
-              <thead>
-                <tr>
-                  <th *ngFor="let col of objectKeys(data[key][subKey][0])">{{ formatLabel(col) }}</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr *ngFor="let row of data[key][subKey]">
-                  <td *ngFor="let col of objectKeys(data[key][subKey][0])">{{ formatValue(row[col], col) }}</td>
-                </tr>
-              </tbody>
-            </table>
-          </ng-container>
+      <!-- ④ DETAILS — data rows -->
+      <tbody>
+        <ng-container *ngIf="rows().length > 0; else emptyRows">
+          <tr *ngFor="let row of rows()" class="detail-row">
+            <td class="col-stt">{{ row.stt }}</td>
+            <td class="col-code">{{ row.code }}</td>
+            <td class="col-label">{{ row.label }}</td>
+            <td class="col-model">{{ row.model }}</td>
+            <td class="col-unit">{{ row.unit }}</td>
+            <td class="col-stock">{{ row.stock }}</td>
+            <td class="col-price">{{ formatCurrency(row.price) }}</td>
+            <td class="col-total">{{ formatCurrency(row.totalValue) }}</td>
+          </tr>
         </ng-container>
-      </div>
-
-    </ng-container>
-
-    <!-- Empty message -->
-    <div class="empty-msg" *ngIf="objectKeys(data).length === 0">Không có dữ liệu cho kỳ này.</div>
+        <ng-template #emptyRows>
+          <tr>
+            <td colspan="8" class="empty-cell">Không có dữ liệu</td>
+          </tr>
+        </ng-template>
+      </tbody>
+    </table>
   </div>
+
+  <!-- ⑤ PAGE FOOTER (repeats on each printed page via CSS) -->
+  <div class="page-footer">
+    <span>Trang <span class="page-number"></span></span>
+  </div>
+
+  <!-- ⑥ REPORT FOOTER (once, bottom of entire report) -->
+  <div class="report-footer">
+    <div class="rf-summary">
+      <table class="summary-table">
+        <tr>
+          <td>Tổng số dòng:</td>
+          <td><strong>{{ rows().length }}</strong></td>
+        </tr>
+        <tr>
+          <td>Tổng giá trị tồn kho:</td>
+          <td><strong>{{ formatCurrency(grandTotal) }}</strong></td>
+        </tr>
+      </table>
+    </div>
+  </div>
+
 </div>

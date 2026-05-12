@@ -193,6 +193,7 @@ export class HomePage implements OnInit {
       next: () => {
         this.submittingProduct.set(false);
         this.submitProductSuccess.set(true);
+        this.productState.loadPhones(this.productState.selectedBrandId() ?? undefined);
       },
       error: (err: any) => {
         this.submittingProduct.set(false);

@@ -58,3 +58,14 @@
 .nav-list a:hover:before {
   opacity: 1;
 }
+
+.nav-divider {
+  height: 1px;
+  background: #e0e0e0;
+  margin: 6px 0;
+}
+
+.nav-link-report {
+  color: #0066cc !important;
+  font-weight: 600 !important;
+}

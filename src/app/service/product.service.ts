@@ -40,6 +40,11 @@ export class ProductService {
     return this.http.get<unknown>(PHONE_BRANDS_API_URL, { params });
   }
 
+  fetchAllProducts(): Observable<any> {
+    const params = new HttpParams().set('size', 100);
+    return this.http.get<any>(PHONE_PRODUCTS_API_URL, { params });
+  }
+
   fetchCurrentStock(productId: number): Observable<any> {
     return this.http.get<any>(`${CURRENT_STOCK_API_URL}/${productId}`);
   }

@@ -1,165 +1,133 @@
-import { Component, inject, signal, OnInit } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ProductService } from '../service/product.service';
 import { AuthService } from '../service/auth.service';
-import { PieChartComponent } from '../component/pie-chart/pie-chart';
-import { extractHttpError } from '../service/http-error.util';
+import * as XLSX from 'xlsx';
+
+interface ReportRow {
+  stt: number;
+  label: string;
+  code: string;
+  model: string;
+  unit: string;
+  price: number;
+  stock: number;
+  totalValue: number;
+}
 
 @Component({
   standalone: true,
   selector: 'app-report',
-  imports: [CommonModule, FormsModule, PieChartComponent],
+  imports: [CommonModule],
   templateUrl: './report.html',
-  styleUrls: ['./report.css'],
+  styleUrl: './report.css',
 })
 export class ReportPage implements OnInit {
   private readonly productService = inject(ProductService);
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
 
-  readonly loading = signal(false);
-  readonly error = signal<string | null>(null);
-  readonly report = signal<any | null>(null);
+  loading = signal(true);
+  error = signal<string | null>(null);
+  rows = signal<ReportRow[]>([]);
+  pendingStocks = signal(0);
 
-  selectedMonth = new Date().getMonth() + 1;
-  selectedYear = new Date().getFullYear();
+  readonly reportDate = new Date();
 
-  months = [
-    { value: 1, label: 'Tháng 1' }, { value: 2, label: 'Tháng 2' },
-    { value: 3, label: 'Tháng 3' }, { value: 4, label: 'Tháng 4' },
-    { value: 5, label: 'Tháng 5' }, { value: 6, label: 'Tháng 6' },
-    { value: 7, label: 'Tháng 7' }, { value: 8, label: 'Tháng 8' },
-    { value: 9, label: 'Tháng 9' }, { value: 10, label: 'Tháng 10' },
-    { value: 11, label: 'Tháng 11' }, { value: 12, label: 'Tháng 12' },
-  ];
-
-  years: number[] = [];
-
-  ngOnInit(): void {
-    const currentYear = new Date().getFullYear();
-    for (let y = currentYear; y >= 2000; y--) {
-      this.years.push(y);
-    }
-    this.fetchReport();
+  get currentUser(): string {
+    return this.authService.getUsername() ?? 'N/A';
   }
 
-  fetchReport(): void {
-    this.loading.set(true);
-    this.error.set(null);
-    this.report.set(null);
-    this.productService.fetchMonthlyReport(this.selectedMonth, this.selectedYear).subscribe({
-      next: (data: any) => {
-        this.loading.set(false);
-        this.report.set(data);
+  get grandTotal(): number {
+    return this.rows().reduce((s, r) => s + r.totalValue, 0);
+  }
+
+  goBack(): void {
+    this.router.navigate(['/']);
+  }
+
+  ngOnInit(): void {
+    this.productService.fetchAllProducts().subscribe({
+      next: (res: any) => {
+        const items: any[] = res?.items ?? res ?? [];
+        const pending = items.length;
+        this.pendingStocks.set(pending);
+
+        const tempRows: ReportRow[] = items.map((p, i) => ({
+          stt: i + 1,
+          label: p.label,
+          code: p.code,
+          model: p.model ?? '',
+          unit: 'Cái',
+          price: Number(p.current_price) || 0,
+          stock: 0,
+          totalValue: 0,
+        }));
+        this.rows.set(tempRows);
+
+        if (pending === 0) {
+          this.loading.set(false);
+          return;
+        }
+
+        items.forEach((p, i) => {
+          this.productService.fetchCurrentStock(p.id).subscribe({
+            next: (stockRes: any) => {
+              const stock =
+                typeof stockRes === 'number'
+                  ? stockRes
+                  : (stockRes?.quantity ?? stockRes?.current_stock ?? stockRes?.stock ?? 0);
+              this.rows.update(rows => {
+                const updated = [...rows];
+                updated[i] = { ...updated[i], stock, totalValue: updated[i].price * stock };
+                return updated;
+              });
+              this.pendingStocks.update(v => {
+                const next = v - 1;
+                if (next === 0) this.loading.set(false);
+                return next;
+              });
+            },
+            error: () => {
+              this.pendingStocks.update(v => {
+                const next = v - 1;
+                if (next === 0) this.loading.set(false);
+                return next;
+              });
+            },
+          });
+        });
       },
-      error: (err: any) => {
+      error: () => {
+        this.error.set('Không thể tải dữ liệu sản phẩm.');
         this.loading.set(false);
-        this.error.set(extractHttpError(err, 'Không thể tải báo cáo. Vui lòng thử lại.'));
       },
     });
   }
 
-  exportPdf(): void {
-    window.print();
+  formatCurrency(value: number): string {
+    return value.toLocaleString('vi-VN') + ' ₫';
   }
 
-  goHome(): void {
-    this.router.navigate(['/']);
-  }
+  exportExcel(): void {
+    const data: any[][] = [
+      ['BÁO CÁO TỒN KHO - CÔNG TY TNHH TEAM96.VN'],
+      [`Ngày in: ${this.reportDate.toLocaleDateString('vi-VN')}`, '', '', '', '', '', '', `Người lập: ${this.currentUser}`],
+      [],
+      ['STT', 'Mã sản phẩm', 'Tên sản phẩm', 'Model', 'ĐVT', 'Tồn kho', 'Đơn giá (₫)', 'Thành tiền (₫)'],
+      ...this.rows().map(r => [r.stt, r.code, r.label, r.model, r.unit, r.stock, r.price, r.totalValue]),
+      [],
+      ['', '', '', '', '', 'TỔNG GIÁ TRỊ TỒN KHO:', '', this.grandTotal],
+    ];
 
-  getRole(): string | null {
-    return this.authService.getRole();
-  }
+    const ws = XLSX.utils.aoa_to_sheet(data);
+    ws['!cols'] = [
+      { wch: 6 }, { wch: 18 }, { wch: 40 }, { wch: 20 }, { wch: 8 }, { wch: 10 }, { wch: 18 }, { wch: 22 },
+    ];
 
-  objectKeys(obj: any): string[] {
-    return obj ? Object.keys(obj) : [];
-  }
-
-  isObject(val: any): boolean {
-    return val !== null && typeof val === 'object' && !Array.isArray(val);
-  }
-
-  isArray(val: any): boolean {
-    return Array.isArray(val);
-  }
-
-  isStringArray(val: any): boolean {
-    return Array.isArray(val) && val.length > 0 && typeof val[0] === 'string';
-  }
-
-  private readonly PIE_OBJECT_KEYS = new Set(['brands', 'categories']);
-
-  isPieObjectKey(key: string): boolean {
-    return this.PIE_OBJECT_KEYS.has(key);
-  }
-
-  pluck(arr: any[], field: string): string[] {
-    return arr.map(item => item[field] ?? '');
-  }
-
-  pluckNum(arr: any[], field: string): number[] {
-    return arr.map(item => Number(item[field]) || 0);
-  }
-
-  formatLabel(key: string): string {
-    const map: Record<string, string> = {
-      month: 'Tháng',
-      year: 'Năm',
-      total_import: 'Tổng nhập',
-      total_export: 'Tổng xuất',
-      total_revenue: 'Doanh thu',
-      total_cost: 'Chi phí nhập',
-      profit: 'Lợi nhuận',
-      total_orders: 'Tổng đơn hàng',
-      total_receipts: 'Tổng phiếu nhập',
-      import_count: 'Số lần nhập',
-      export_count: 'Số lần xuất',
-      import_value: 'Giá trị nhập',
-      export_value: 'Giá trị xuất',
-      product_name: 'Sản phẩm',
-      product_id: 'Mã SP',
-      quantity: 'Số lượng',
-      revenue: 'Doanh thu',
-      cost: 'Chi phí',
-      receipts: 'Phiếu nhập',
-      deliveries: 'Phiếu xuất',
-      total_count: 'Tổng số phiếu',
-      total_value: 'Tổng giá trị',
-      daily: 'Theo ngày',
-      date: 'Ngày',
-      count: 'Số phiếu',
-      total_products: 'Tổng sản phẩm',
-      total_brands: 'Tổng thương hiệu',
-      total_categories: 'Tổng danh mục',
-      brands: 'Cơ cấu thương hiệu',
-      categories: 'Cơ cấu danh mục',
-      name: 'Tên',
-      product_count: 'Số sản phẩm',
-    };
-    return map[key] ?? key.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
-  }
-
-  private readonly CURRENCY_KEYS = new Set([
-    'total_revenue', 'total_cost', 'profit', 'import_value', 'export_value',
-    'revenue', 'cost', 'unit_cost', 'total_value', 'value', 'amount',
-    'discount_amount', 'total_amount', 'price', 'unit_price',
-  ]);
-
-  formatValue(val: any, key?: string): string {
-    if (val === null || val === undefined) return '—';
-    const isCurrency = key && this.CURRENCY_KEYS.has(key);
-    // parse string numbers (API may return floats as strings)
-    const num = typeof val === 'number' ? val : (typeof val === 'string' && val.trim() !== '' && !isNaN(Number(val)) ? Number(val) : null);
-    if (num !== null) {
-      if (isCurrency) {
-        return num.toLocaleString('vi-VN', { minimumFractionDigits: 0, maximumFractionDigits: 0 }) + ' ₫';
-      }
-      return Number.isInteger(num)
-        ? num.toLocaleString('vi-VN')
-        : num.toLocaleString('vi-VN', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
-    }
-    return String(val);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Tồn kho');
+    XLSX.writeFile(wb, `BaoCaoTonKho_${this.reportDate.toISOString().slice(0, 10)}.xlsx`);
   }
 }

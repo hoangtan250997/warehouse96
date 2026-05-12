@@ -80,3 +80,10 @@ app-navbar {
   margin-left: 0;
   padding: var(--header-h) 0 0;
 }
+
+.content-no-sidebar {
+  margin-left: 0;
+  padding: calc(var(--header-h) + 24px) 0 0;
+  min-height: calc(100vh - var(--header-h));
+  background-color: #eef2f7;
+}
