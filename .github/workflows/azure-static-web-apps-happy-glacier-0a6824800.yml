@@ -25,9 +25,14 @@ jobs:
           node-version: '22'
       - name: Clear npm auth
         run: |
-          echo "registry=https://registry.npmjs.org/" > ~/.npmrc
+          NPM_USER_CONFIG=$(npm config get userconfig)
+          echo "Clearing: $NPM_USER_CONFIG"
+          echo "registry=https://registry.npmjs.org/" > "$NPM_USER_CONFIG"
       - name: Install dependencies
         run: npm install --prefer-offline
+        env:
+          NODE_AUTH_TOKEN: ''
+          NPM_TOKEN: ''
       - name: Build app
         run: npm run build
       - name: Deploy to Azure Static Web Apps
