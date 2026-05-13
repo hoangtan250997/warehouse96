@@ -23,25 +23,13 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22'
-<<<<<<<<< Temporary merge branch 1
-      - name: Clear npm auth
-        run: |
-          NPM_USER_CONFIG=$(npm config get userconfig)
-          echo "Clearing: $NPM_USER_CONFIG"
-          echo "registry=https://registry.npmjs.org/" > "$NPM_USER_CONFIG"
-      - name: Install dependencies
-        run: npm install --prefer-offline
-        env:
-          NODE_AUTH_TOKEN: ''
-          NPM_TOKEN: ''
-=========
       - name: Install dependencies
         run: |
-          echo "registry=https://registry.npmjs.org/" > /tmp/clean.npmrc
+          printf 'registry=https://registry.npmjs.org/\n' > /tmp/npm-clean.npmrc
           npm install --prefer-offline
         env:
-          NPM_CONFIG_USERCONFIG: /tmp/clean.npmrc
->>>>>>>>> Temporary merge branch 2
+          NPM_CONFIG_USERCONFIG: /tmp/npm-clean.npmrc
+          NPM_CONFIG_GLOBALCONFIG: /tmp/npm-clean.npmrc
       - name: Build app
         run: npm run build
       - name: Deploy to Azure Static Web Apps
