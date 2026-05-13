@@ -23,10 +23,11 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22'
+      - name: Clear npm auth
+        run: |
+          echo "registry=https://registry.npmjs.org/" > ~/.npmrc
       - name: Install dependencies
         run: npm install --prefer-offline
-        env:
-          npm_config_registry: https://registry.npmjs.org/
       - name: Build app
         run: npm run build
       - name: Deploy to Azure Static Web Apps
