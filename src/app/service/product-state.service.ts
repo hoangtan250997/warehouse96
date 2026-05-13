@@ -41,7 +41,7 @@ export class ProductStateService {
       this.router.navigate(['/login']);
       return;
     }
-    errorSignal(extractHttpError(err, 'Unknown error'));
+    errorSignal(extractHttpError(err, 'Đã xảy ra lỗi không xác định'));
   }
 
   loadPhones(brandId?: number): void {

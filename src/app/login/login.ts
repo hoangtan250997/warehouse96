@@ -30,7 +30,7 @@ export class LoginPage {
 
     if (this.loginForm.invalid) {
       this.loginForm.markAllAsTouched();
-      this.loginError.set('Username and password are required.');
+      this.loginError.set('Tên đăng nhập và mật khẩu là bắt buộc.');
       return;
     }
 
@@ -45,7 +45,7 @@ export class LoginPage {
         this.router.navigateByUrl('/');
       },
       error: (err) => {
-        this.loginError.set('Login failed: ' + (err?.error?.detail ?? err?.message ?? 'Invalid credentials'));
+        this.loginError.set('Đăng nhập thất bại: ' + (err?.error?.detail ?? err?.message ?? 'Sai tên đăng nhập hoặc mật khẩu'));
         this.loginForm.reset();
         this.loginLoading.set(false);
       },
