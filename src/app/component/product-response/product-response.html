@@ -19,7 +19,7 @@
             <span class="product-price">{{ formatPrice(item.current_price) }} / cái</span>
           </div>
           <div class="stock-info">Tồn kho: <strong>{{ getStock(item.id) }}</strong></div>
-          <div class="quantity-control">
+          <div class="quantity-control" *ngIf="role !== 'ACCOUNTANT'">
             <button class="qty-btn" (click)="decrement(item.id)" [disabled]="getQuantity(item.id) === 0">−</button>
             <span class="qty-value">{{ getQuantity(item.id) }}</span>
             <button class="qty-btn" (click)="increment(item.id)">+</button>
@@ -30,7 +30,7 @@
               Tạo phiếu xuất
             </button>
             <button class="create-receipt-btn" *ngIf="role === 'WAREHOUSE_STAFF' || role === 'MANAGER'"
-              (click)="onCreateReceipt(item)">
+              (click)="onCreateReceipt(item)" [disabled]="getQuantity(item.id) === 0">
               Tạo phiếu nhập
             </button>
           </div>
