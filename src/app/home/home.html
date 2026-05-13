@@ -110,8 +110,8 @@
           <div class="gdn-grid">
             <div class="gdn-field"><span>ID</span><strong>{{ gdn.id }}</strong></div>
             <div class="gdn-field"><span>Mã phiếu</span><strong>{{ gdn.code }}</strong></div>
-            <div class="gdn-field"><span>Khách hàng ID</span><strong>{{ gdn.customer_id }}</strong></div>
-            <div class="gdn-field"><span>Nhân viên ID</span><strong>{{ gdn.employee_id }}</strong></div>
+            <div class="gdn-field"><span>Khách hàng</span><strong>{{ getCustomerName(gdn.customer_id) }}</strong></div>
+            <div class="gdn-field"><span>Nhân viên</span><strong>{{ getUsername() }}</strong></div>
             <div class="gdn-field"><span>Ngày giao</span><strong>{{ gdn.delivery_date | date:'dd/MM/yyyy HH:mm' }}</strong></div>
             <div class="gdn-field"><span>Trạng thái</span><strong>{{ gdn.delivery_status }}</strong></div>
             <div class="gdn-field"><span>Giảm giá (VND)</span><strong>{{ gdn.discount_amount }}</strong></div>
@@ -228,8 +228,8 @@
           <div class="gdn-grid">
             <div class="gdn-field"><span>ID</span><strong>{{ grn.id }}</strong></div>
             <div class="gdn-field"><span>Mã phiếu</span><strong>{{ grn.code }}</strong></div>
-            <div class="gdn-field"><span>Nhà cung cấp ID</span><strong>{{ grn.supplier_id }}</strong></div>
-            <div class="gdn-field"><span>Nhân viên ID</span><strong>{{ grn.employee_id }}</strong></div>
+            <div class="gdn-field"><span>Nhà cung cấp</span><strong>{{ getSupplierName(grn.supplier_id) }}</strong></div>
+            <div class="gdn-field"><span>Nhân viên</span><strong>{{ getUsername() }}</strong></div>
             <div class="gdn-field"><span>Ngày nhập</span><strong>{{ grn.received_date | date:'dd/MM/yyyy HH:mm' }}</strong></div>
             <div class="gdn-field"><span>Trạng thái</span><strong>{{ grn.receipt_status }}</strong></div>
           </div>

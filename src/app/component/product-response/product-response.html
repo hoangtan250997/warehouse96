@@ -26,7 +26,7 @@
           </div>
           <div class="card-actions">
             <button class="create-order-btn" *ngIf="role === 'SALES' || role === 'MANAGER'"
-              (click)="onAddToCart(item)" [disabled]="getQuantity(item.id) === 0 || getStock(item.id) === 0">
+              (click)="onAddToCart(item)" [disabled]="getQuantity(item.id) === 0 || getStock(item.id) === 0 || getQuantity(item.id) > getStock(item.id)">
               Tạo phiếu xuất
             </button>
             <button class="create-receipt-btn" *ngIf="role === 'WAREHOUSE_STAFF' || role === 'MANAGER'"

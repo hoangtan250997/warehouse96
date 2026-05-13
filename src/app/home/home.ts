@@ -131,6 +131,18 @@ export class HomePage implements OnInit {
     record: '',
   };
 
+  getCustomerName(id: number): string {
+    return this.customers().find(c => c.id === id)?.label ?? String(id);
+  }
+
+  getSupplierName(id: number): string {
+    return this.suppliers().find(s => s.id === id)?.label ?? String(id);
+  }
+
+  getUsername(): string | null {
+    return this.authService.getUsername();
+  }
+
   ngOnInit(): void {
     this.productService.fetchCustomers().subscribe({
       next: (res: any) => this.customers.set(res?.items ?? res ?? []),
