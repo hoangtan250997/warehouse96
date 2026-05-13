@@ -94,7 +94,7 @@ export class HomePage implements OnInit {
   };
 
   receiptData = {
-    code: this.generateReceiptCode(),
+    code: '',
     supplierId: '',
     receivedDate: this.nowForInput(),
     receiptStatus: 'CONFIRMED',
@@ -102,18 +102,6 @@ export class HomePage implements OnInit {
     unitCost: null as number | null,
     serialNumbers: '',
   };
-
-  private generateReceiptCode(): string {
-    const now = new Date();
-    const pad = (n: number) => n.toString().padStart(2, '0');
-    return `GRN-${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}`;
-  }
-
-  private generateDeliveryCode(): string {
-    const now = new Date();
-    const pad = (n: number) => n.toString().padStart(2, '0');
-    return `GDN-${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}`;
-  }
 
   private nowForInput(): string {
     const now = new Date();
@@ -219,7 +207,7 @@ export class HomePage implements OnInit {
     this.submitError.set(null);
     this.submitSuccess.set(false);
     this.gdnResponse.set(null);
-    this.form = { code: this.generateDeliveryCode(), customerId: '', deliveryDate: this.nowForInput(), deliveryStatus: 'CONFIRMED', discountAmount: null, discountPercent: null, record: '' };
+    this.form = { code: '', customerId: '', deliveryDate: this.nowForInput(), deliveryStatus: 'CONFIRMED', discountAmount: null, discountPercent: null, record: '' };
   }
 
   onOpenReceiptForm(event: OpenReceiptFormEvent): void {
@@ -227,7 +215,7 @@ export class HomePage implements OnInit {
     this.submitReceiptError.set(null);
     this.submitReceiptSuccess.set(false);
     this.grnResponse.set(null);
-    this.receiptData = { code: this.generateReceiptCode(), supplierId: '', receivedDate: this.nowForInput(), receiptStatus: 'confirmed', record: '', unitCost: null, serialNumbers: '' };
+    this.receiptData = { code: '', supplierId: '', receivedDate: this.nowForInput(), receiptStatus: 'confirmed', record: '', unitCost: null, serialNumbers: '' };
   }
 
   closeReceiptModal(): void {
@@ -270,8 +258,8 @@ export class HomePage implements OnInit {
   }
 
   private _doSubmit(item: OpenFormEvent, inventoryIds: number[]): void {
-    const rawPrice = item.product.current_price?.toString().replace(/\./g, '').replace(/,/g, '.') ?? '0';
-    const unitPrice = parseFloat(rawPrice) || 1;
+    const rawPrice = parseFloat(item.product.current_price) || 1;
+    const unitPrice = rawPrice;
 
     console.log('[GDN inventory_ids]', inventoryIds);
     const body: any = {
@@ -319,8 +307,7 @@ export class HomePage implements OnInit {
       return;
     }
 
-    const rawCost = item.product.current_price?.toString().replace(/\./g, '').replace(/,/g, '.') ?? '0';
-    const unitCost = this.receiptData.unitCost ?? (parseFloat(rawCost) || 1);
+    const unitCost = this.receiptData.unitCost ?? (parseFloat(item.product.current_price) || 1);
 
     this.submittingReceipt.set(true);
     this.submitReceiptError.set(null);
