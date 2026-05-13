@@ -1,7 +1,7 @@
 <section class="home-page">
 
   <!-- Hướng dẫn sử dụng -->
-  <div class="guide-banner" *ngIf="!productState.selectedBrandId() && !productState.brandsLoading()">
+  <div class="guide-banner" *ngIf="!productState.currentProductTypeId() && !productState.brandsLoading()">
     <div class="guide-header">👋 Chào mừng đến hệ thống quản lý kho!</div>
     <div class="guide-steps">
       <div class="guide-step">
