@@ -25,11 +25,12 @@ jobs:
           node-version: '22'
       - name: Install dependencies
         run: |
-          printf 'registry=https://registry.npmjs.org/\n' > /tmp/npm-clean.npmrc
+          printf 'registry=https://registry.npmjs.org/\n' > /tmp/npm-user.npmrc
+          printf 'registry=https://registry.npmjs.org/\n' > /tmp/npm-global.npmrc
           npm install --prefer-offline
         env:
-          NPM_CONFIG_USERCONFIG: /tmp/npm-clean.npmrc
-          NPM_CONFIG_GLOBALCONFIG: /tmp/npm-clean.npmrc
+          NPM_CONFIG_USERCONFIG: /tmp/npm-user.npmrc
+          NPM_CONFIG_GLOBALCONFIG: /tmp/npm-global.npmrc
       - name: Build app
         run: npm run build
       - name: Deploy to Azure Static Web Apps
