@@ -1,5 +1,44 @@
 <section class="home-page">
 
+  <!-- Hướng dẫn sử dụng -->
+  <div class="guide-banner" *ngIf="!productState.selectedBrandId() && !productState.brandsLoading()">
+    <div class="guide-header">👋 Chào mừng đến hệ thống quản lý kho!</div>
+    <div class="guide-steps">
+      <div class="guide-step">
+        <span class="guide-num">1</span>
+        <div>
+          <strong>Chọn loại sản phẩm</strong> từ thanh điều hướng bên trái để xem danh mục.
+        </div>
+      </div>
+      <div class="guide-step">
+        <span class="guide-num">2</span>
+        <div>
+          <strong>Chọn thương hiệu</strong> từ thanh bên dưới để xem danh sách sản phẩm.
+        </div>
+      </div>
+      <ng-container *ngIf="canCreateGDN() || canCreateGRN()">
+        <div class="guide-step">
+          <span class="guide-num">3</span>
+          <div *ngIf="canCreateGDN() && canCreateGRN()">
+            <strong>Tạo phiếu xuất / nhập kho:</strong> chọn số lượng rồi nhấn nút tương ứng trên thẻ sản phẩm.
+          </div>
+          <div *ngIf="canCreateGDN() && !canCreateGRN()">
+            <strong>Tạo phiếu xuất kho:</strong> chọn số lượng rồi nhấn <em>Tạo phiếu xuất</em> trên thẻ sản phẩm.
+          </div>
+          <div *ngIf="canCreateGRN() && !canCreateGDN()">
+            <strong>Tạo phiếu nhập kho:</strong> chọn số lượng rồi nhấn <em>Tạo phiếu nhập</em> trên thẻ sản phẩm.
+          </div>
+        </div>
+      </ng-container>
+      <div class="guide-step" *ngIf="canAddProduct()">
+        <span class="guide-num">{{ (canCreateGDN() || canCreateGRN()) ? 4 : 3 }}</span>
+        <div>
+          <strong>Thêm sản phẩm mới:</strong> nhấn nút <em>＋</em> ở góc phải thanh thương hiệu.
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div *ngIf="productState.brandsLoading()" class="brands-loading">
     <div class="spinner"></div>
     <span>Đang tải thương hiệu...</span>
