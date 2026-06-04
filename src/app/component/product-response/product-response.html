@@ -12,13 +12,19 @@
   <ng-container *ngIf="response as res">
     <div class="product-grid">
       <div class="product-card" *ngFor="let item of res.items">
-        <div class="product-img">&#128241;</div>
+        <div class="product-img">
+          <span class="product-img-icon">&#128241;</span>
+          <span class="stock-badge" [class.stock-badge-empty]="getStock(item.id) === 0">
+            {{ getStock(item.id) > 0 ? 'Còn ' + getStock(item.id) : 'Hết hàng' }}
+          </span>
+        </div>
         <div class="product-body">
           <div class="product-label">{{ item.label }}</div>
+          <div class="product-code" *ngIf="item.code">{{ item.code }}<ng-container *ngIf="item.model"> · {{ item.model }}</ng-container></div>
           <div class="product-meta">
-            <span class="product-price">{{ formatPrice(item.current_price) }} / cái</span>
+            <span class="product-price">{{ formatPrice(item.current_price) }}</span>
+            <span class="product-unit">/ cái</span>
           </div>
-          <div class="stock-info">Tồn kho: <strong>{{ getStock(item.id) }}</strong></div>
           <div class="quantity-control" *ngIf="role !== 'ACCOUNTANT'">
             <button class="qty-btn" (click)="decrement(item.id)" [disabled]="getQuantity(item.id) === 0">−</button>
             <span class="qty-value">{{ getQuantity(item.id) }}</span>
@@ -27,11 +33,11 @@
           <div class="card-actions">
             <button class="create-order-btn" *ngIf="role === 'SALES' || role === 'MANAGER'"
               (click)="onAddToCart(item)" [disabled]="getQuantity(item.id) === 0 || getStock(item.id) === 0 || getQuantity(item.id) > getStock(item.id)">
-              Tạo phiếu xuất
+              ↗ Tạo phiếu xuất
             </button>
             <button class="create-receipt-btn" *ngIf="role === 'WAREHOUSE_STAFF' || role === 'MANAGER'"
               (click)="onCreateReceipt(item)" [disabled]="getQuantity(item.id) === 0">
-              Tạo phiếu nhập
+              ↙ Tạo phiếu nhập
             </button>
           </div>
         </div>

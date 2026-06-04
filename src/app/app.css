@@ -5,15 +5,6 @@
   padding: 0;
 }
 
-html,
-body {
-  min-height: 100vh;
-  margin: 0;
-  padding: 0;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: #eef2f7;
-}
-
 app-header {
   position: fixed;
   top: 0;
@@ -23,43 +14,6 @@ app-header {
   height: var(--header-h);
 }
 
-.secondary-nav {
-  display: flex;
-  gap: 20px;
-  padding: 0 30px;
-  background-color: #fff;
-  border-bottom: 1px solid #eee;
-  margin-top: 70px;
-  font-size: 14px;
-  position: fixed;
-  top: 70px;
-  left: 280px;
-  right: 0;
-  z-index: 999;
-  height: 50px;
-  align-items: center;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-}
-
-.secondary-nav a {
-  text-decoration: none;
-  color: #555;
-  font-weight: 500;
-  transition: color 0.2s;
-  white-space: nowrap;
-  padding: 0 5px;
-}
-
-.secondary-nav a:hover {
-  color: #0099ff;
-}
-
-.main-container {
-  display: flex;
-  margin-top: 120px;
-  min-height: calc(100vh - 120px);
-}
-
 app-navbar {
   position: fixed;
   left: 0;
@@ -67,13 +21,17 @@ app-navbar {
   bottom: 0;
   width: 240px;
   display: block;
+  z-index: 900;
 }
 
 .content {
   margin-left: 240px;
   padding: calc(var(--header-h) + 24px) 28px 28px;
   min-height: calc(100vh - var(--header-h));
-  background-color: #eef2f7;
+  background:
+    radial-gradient(1100px 420px at 85% -10%, rgba(37, 99, 235, 0.06), transparent 60%),
+    radial-gradient(900px 380px at -10% 8%, rgba(124, 58, 237, 0.05), transparent 55%),
+    var(--bg-page);
 }
 
 .content.no-sidebar {
@@ -85,5 +43,5 @@ app-navbar {
   margin-left: 0;
   padding: calc(var(--header-h) + 24px) 0 0;
   min-height: calc(100vh - var(--header-h));
-  background-color: #eef2f7;
+  background-color: var(--bg-page);
 }

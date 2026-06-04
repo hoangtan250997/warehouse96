@@ -1,38 +1,40 @@
 <div class="header">
   <div class="header-left">
     <div class="logo">
-      <span class="logo-icon">◼ ◼<br />◼ ◼</span>
-      <span class="logo-text">TEAM96.VN</span>
+      <span class="logo-badge">96</span>
+      <span class="logo-text">TEAM96<span class="logo-dot">.VN</span></span>
     </div>
   </div>
 
   <div class="header-center">
     <div class="search-wrap">
+      <span class="search-icon">⌕</span>
       <input type="text" class="search-bar" placeholder="Tìm kiếm sản phẩm..."
         [value]="productState.searchQuery()"
         (input)="onSearch($event)" />
-      <span class="search-icon">🔍</span>
     </div>
   </div>
 
   <div class="header-right">
+    <a *ngIf="isLoggedIn() && getRole() === 'MANAGER'" routerLink="/report" class="report-btn">📊 Báo cáo</a>
+
+    <div class="notification" title="Thông báo">
+      <span class="bell-icon">🔔</span>
+      <span class="notification-dot"></span>
+    </div>
+
     <div class="user-section">
-      <span class="user-icon">👤</span>
+      <span class="user-avatar" *ngIf="!isLoggedIn()">👤</span>
+      <span class="user-avatar avatar-initial" *ngIf="isLoggedIn()">{{ (getUsername() || '?').charAt(0).toUpperCase() }}</span>
       <div class="user-text" *ngIf="!isLoggedIn()">
         <div>Login</div>
         <div>Register</div>
       </div>
       <div class="user-text" *ngIf="isLoggedIn()">
-        <div>Xin chào, <strong>{{ getUsername() }}</strong></div>
+        <div class="user-name">Xin chào, <strong>{{ getUsername() }}</strong></div>
         <div class="role-badge role-{{ getRole()?.toLowerCase() }}">{{ getRoleLabel() }}</div>
-        <div class="logout-btn" (click)="logout()">Logout</div>
       </div>
-    </div>
-
-    <a *ngIf="isLoggedIn() && getRole() === 'MANAGER'" routerLink="/report" class="report-btn">📊 Báo cáo</a>
-
-    <div class="notification">
-      <span class="bell-icon">🔔</span>
+      <div class="logout-btn" *ngIf="isLoggedIn()" (click)="logout()" title="Đăng xuất">Đăng xuất</div>
     </div>
   </div>
 </div>

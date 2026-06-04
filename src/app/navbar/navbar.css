@@ -1,71 +1,68 @@
 .navbar {
-  background-color: #fff;
-  border-right: 1px solid #eee;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
   width: 100%;
   height: 100%;
   overflow-y: auto;
-  box-shadow: 1px 0 3px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  padding: 14px 10px;
+}
+
+.nav-section-title {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  padding: 4px 12px 10px;
 }
 
 .nav-list {
   display: flex;
   flex-direction: column;
+  gap: 2px;
   list-style: none;
   margin: 0;
   padding: 0;
 }
 
-.nav-list li {
-  margin: 0;
-  border-bottom: 1px solid #f2f2f2;
-}
-
-.nav-list li:last-child {
-  border-bottom: none;
-}
-
 .nav-list a {
   text-decoration: none;
-  color: #4a4a4a;
-  font-size: 14px;
+  color: var(--text-secondary);
+  font-size: 13.5px;
   font-weight: 500;
-  padding: 14px 16px;
+  padding: 10px 12px;
   display: flex;
   align-items: center;
   gap: 12px;
-  transition: all 0.15s ease;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.16s ease;
   position: relative;
 }
 
+.nav-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  font-size: 16px;
+  border-radius: 8px;
+  background: var(--surface-muted);
+  flex-shrink: 0;
+  transition: all 0.16s ease;
+}
+
 .nav-list a:hover {
-  background: linear-gradient(to right, rgba(0, 153, 255, 0.08), transparent);
-  color: #0099ff;
-  padding-left: 20px;
+  background: var(--gradient-brand-soft);
+  color: var(--primary);
+  transform: translateX(3px);
 }
 
-.nav-list a:before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: 3px;
-  background-color: #0099ff;
-  opacity: 0;
-  transition: opacity 0.15s ease;
-}
-
-.nav-list a:hover:before {
-  opacity: 1;
-}
-
-.nav-divider {
-  height: 1px;
-  background: #e0e0e0;
-  margin: 6px 0;
-}
-
-.nav-link-report {
-  color: #0066cc !important;
-  font-weight: 600 !important;
+.nav-list a:hover .nav-icon {
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+  transform: scale(1.08);
 }

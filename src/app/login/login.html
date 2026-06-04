@@ -1,11 +1,15 @@
 <div class="login-wrapper">
 <section class="login-page">
-  <h1>Login</h1>
+  <div class="login-brand">
+    <span class="login-logo">96</span>
+    <h1>TEAM96<span class="brand-dot">.VN</span></h1>
+    <p class="login-tagline">Hệ thống quản lý kho hàng</p>
+  </div>
 
   <form [formGroup]="loginForm" (ngSubmit)="submitLogin($event)">
     <label>
       Username
-      <input type="text" formControlName="username" placeholder="Username" />
+      <input type="text" formControlName="username" placeholder="Tên đăng nhập" autocomplete="username" />
       <div
         *ngIf="loginForm.get('username')?.invalid && loginForm.get('username')?.touched"
         class="field-error"
@@ -16,7 +20,7 @@
 
     <label>
       Password
-      <input type="password" formControlName="password" placeholder="Password" />
+      <input type="password" formControlName="password" placeholder="Mật khẩu" autocomplete="current-password" />
       <div
         *ngIf="loginForm.get('password')?.invalid && loginForm.get('password')?.touched"
         class="field-error"
@@ -25,7 +29,9 @@
       </div>
     </label>
 
-    <button type="submit" [disabled]="loginLoading()">Sign in</button>
+    <button type="submit" [disabled]="loginLoading()">
+      {{ loginLoading() ? 'Đang đăng nhập…' : 'Đăng nhập' }}
+    </button>
   </form>
 
   <div *ngIf="loginLoading()" class="status">Logging in…</div>
