@@ -16,6 +16,14 @@
   </div>
 
   <div class="header-right">
+    <div class="backend-switch" title="Máy chủ API (chuyển sẽ đăng xuất và tải lại)">
+      <span class="backend-switch-icon">🔌</span>
+      <select class="backend-select" [value]="currentBackend()" (change)="switchBackend($event)">
+        <option value="python">Python</option>
+        <option value="php">PHP</option>
+      </select>
+    </div>
+
     <a *ngIf="isLoggedIn() && getRole() === 'MANAGER'" routerLink="/report" class="report-btn">📊 Báo cáo</a>
 
     <div class="notification" title="Thông báo">

@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../service/auth.service';
 import { ProductStateService } from '../../service/product-state.service';
+import { BackendKey, activeBackend, setSelectedBackend } from '../../service/api-config';
 
 @Component({
   standalone: true,
@@ -18,6 +19,23 @@ export class Header {
 
   onSearch(event: Event): void {
     this.productState.searchQuery.set((event.target as HTMLInputElement).value);
+  }
+
+  currentBackend(): BackendKey {
+    return activeBackend();
+  }
+
+  /**
+   * Switch the API backend at runtime. The two backends don't share auth
+   * (different SECRET_KEY + database), so we clear the session and reload so
+   * every service re-reads the new base URL and the guard sends us to /login.
+   */
+  switchBackend(event: Event): void {
+    const key = (event.target as HTMLSelectElement).value as BackendKey;
+    if (key === this.currentBackend()) return;
+    setSelectedBackend(key);
+    this.authService.logout();
+    window.location.reload();
   }
 
   isLoggedIn(): boolean {

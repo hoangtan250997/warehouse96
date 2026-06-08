@@ -2,9 +2,9 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
-import { environment } from '../../environments/environment';
+import { resolveApiBaseUrl } from './api-config';
 
-const BASE = environment.apiBaseUrl;
+const BASE = resolveApiBaseUrl();
 const PHONE_PRODUCTS_API_URL = `${BASE}/api/v1/products`;
 const PHONE_BRANDS_API_URL = `${BASE}/api/v1/products/brands`;
 const CURRENT_STOCK_API_URL = `${BASE}/api/v1/inventory/current-stock`;

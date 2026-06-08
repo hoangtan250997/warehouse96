@@ -438,3 +438,34 @@ textarea {
   border-radius: 50%;
   animation: spin 0.7s linear infinite;
 }
+
+/* ── Runtime backend switcher (header) ─────────────────────────── */
+.backend-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 8px 5px 10px;
+  background: var(--surface-2, rgba(255, 255, 255, 0.06));
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.14));
+  border-radius: var(--radius-pill);
+  white-space: nowrap;
+}
+
+.backend-switch-icon {
+  font-size: 13px;
+  line-height: 1;
+}
+
+.backend-select {
+  background: transparent;
+  border: none;
+  color: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  outline: none;
+}
+
+.backend-select option {
+  color: #1a1a1a;
+}
