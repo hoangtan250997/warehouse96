@@ -1,0 +1,8 @@
+{
+  "/api": {
+    "target": "https://warehouse-api-php.azurewebsites.net",
+    "secure": true,
+    "changeOrigin": true,
+    "logLevel": "debug"
+  }
+}
