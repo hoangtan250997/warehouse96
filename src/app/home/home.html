@@ -36,6 +36,12 @@
           <strong>Thêm sản phẩm mới:</strong> nhấn nút <em>＋</em> ở góc phải thanh thương hiệu.
         </div>
       </div>
+      <div class="guide-step" *ngIf="canEditPrice()">
+        <span class="guide-num">{{ (canCreateGDN() || canCreateGRN()) ? 5 : 4 }}</span>
+        <div>
+          <strong>Sửa giá sản phẩm:</strong> nhấn <em>✎ Sửa giá</em> trên thẻ sản phẩm để cập nhật giá bán.
+        </div>
+      </div>
     </div>
   </div>
 
@@ -67,7 +73,8 @@
     [response]="productState.filteredResponse()"
     [role]="userRole"
     (openForm)="onOpenForm($event)"
-    (openReceiptForm)="onOpenReceiptForm($event)">
+    (openReceiptForm)="onOpenReceiptForm($event)"
+    (editPrice)="onEditPrice($event)">
   </app-product-response>
 
   <!-- Modal overlay - Phiếu xuất (SALES, MANAGER) -->
@@ -350,6 +357,53 @@
         <div class="submit-success">✓ Tạo sản phẩm thành công!</div>
         <div class="modal-actions">
           <button type="button" class="submit-btn" (click)="closeProductModal()">Đóng</button>
+        </div>
+      </ng-template>
+    </div>
+  </div>
+
+  <!-- Edit Price Modal (ACCOUNTANT, MANAGER) -->
+  <div class="modal-overlay" *ngIf="priceEditItem() && canEditPrice()" (click)="closePriceModal()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <div>
+          <div class="modal-title">✎ Sửa giá sản phẩm</div>
+          <div class="modal-subtitle">{{ priceEditItem()!.label }}<ng-container *ngIf="priceEditItem()!.code"> · {{ priceEditItem()!.code }}</ng-container></div>
+        </div>
+        <button class="modal-close" (click)="closePriceModal()">✕</button>
+      </div>
+
+      <ng-container *ngIf="!priceEditSuccess(); else priceSuccessBlock">
+        <form class="checkout-form" (ngSubmit)="submitPrice()" #priceForm="ngForm">
+          <div class="form-row">
+            <div class="form-group full-width">
+              <label>Giá hiện tại</label>
+              <input type="text" [value]="priceEditItem()!.current_price ? (priceEditItem()!.current_price | number:'1.0-0') + ' ₫' : '—'" disabled />
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group full-width">
+              <label>Giá mới (VND) *</label>
+              <input type="number" [(ngModel)]="priceData.price" name="price" min="0" required />
+            </div>
+          </div>
+
+          <div *ngIf="priceEditError()" class="submit-error">⚠ {{ priceEditError() }}</div>
+
+          <div class="modal-actions">
+            <button type="button" class="cancel-btn" (click)="closePriceModal()">Hủy</button>
+            <button type="submit" class="submit-btn" [disabled]="submittingPrice() || priceForm.invalid">
+              {{ submittingPrice() ? 'Đang lưu...' : 'Cập nhật giá' }}
+            </button>
+          </div>
+        </form>
+      </ng-container>
+
+      <ng-template #priceSuccessBlock>
+        <div class="submit-success">✓ Cập nhật giá thành công!</div>
+        <div class="modal-actions">
+          <button type="button" class="submit-btn" (click)="closePriceModal()">Đóng</button>
         </div>
       </ng-template>
     </div>

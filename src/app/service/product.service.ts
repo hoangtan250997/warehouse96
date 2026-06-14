@@ -90,6 +90,10 @@ export class ProductService {
     return this.http.post<any>(PHONE_PRODUCTS_API_URL, body);
   }
 
+  updateProductPrice(productId: number, price: number): Observable<any> {
+    return this.http.patch<any>(`${PHONE_PRODUCTS_API_URL}/${productId}/price`, { price });
+  }
+
   fetchMonthlyReport(month: number, year: number): Observable<any> {
     const params = new HttpParams()
       .set('month', month)

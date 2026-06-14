@@ -52,6 +52,7 @@ export class ProductResponse implements OnChanges {
   @Input() role: string | null = null;
   @Output() openForm = new EventEmitter<OpenFormEvent>();
   @Output() openReceiptForm = new EventEmitter<OpenReceiptFormEvent>();
+  @Output() editPrice = new EventEmitter<Product>();
 
   stockMap: Record<number, number> = {};
   quantityMap: Record<number, number> = {};
@@ -127,5 +128,9 @@ export class ProductResponse implements OnChanges {
   onCreateReceipt(item: Product): void {
     const quantity = Math.max(this.quantityMap[item.id] ?? 0, 1);
     this.openReceiptForm.emit({ product: item, quantity });
+  }
+
+  onEditPrice(item: Product): void {
+    this.editPrice.emit(item);
   }
 }

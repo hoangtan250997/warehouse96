@@ -39,6 +39,10 @@
               (click)="onCreateReceipt(item)" [disabled]="getQuantity(item.id) === 0">
               ↙ Tạo phiếu nhập
             </button>
+            <button class="edit-price-btn" *ngIf="role === 'ACCOUNTANT' || role === 'MANAGER'"
+              (click)="onEditPrice(item)">
+              ✎ Sửa giá
+            </button>
           </div>
         </div>
       </div>

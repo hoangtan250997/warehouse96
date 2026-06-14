@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { ProductStateService } from '../service/product-state.service';
 import { ProductService } from '../service/product.service';
 import { AuthService } from '../service/auth.service';
-import { ProductResponse, OpenFormEvent, OpenReceiptFormEvent } from '../component/product-response/product-response';
+import { ProductResponse, OpenFormEvent, OpenReceiptFormEvent, Product } from '../component/product-response/product-response';
 import { extractHttpError } from '../service/http-error.util';
 
 interface Customer {
@@ -47,6 +47,10 @@ export class HomePage implements OnInit {
     return this.userRole === 'ACCOUNTANT' || this.userRole === 'MANAGER';
   }
 
+  canEditPrice(): boolean {
+    return this.userRole === 'ACCOUNTANT' || this.userRole === 'MANAGER';
+  }
+
   readonly customers = signal<Customer[]>([]);
   readonly suppliers = signal<Supplier[]>([]);
   readonly selectedItem = signal<OpenFormEvent | null>(null);
@@ -68,6 +72,13 @@ export class HomePage implements OnInit {
   readonly submitProductError = signal<string | null>(null);
   readonly submitProductSuccess = signal(false);
   readonly newProductBrands = signal<{ id: number; label: string }[]>([]);
+
+  // Edit price state (ACCOUNTANT / MANAGER)
+  readonly priceEditItem = signal<Product | null>(null);
+  readonly submittingPrice = signal(false);
+  readonly priceEditError = signal<string | null>(null);
+  readonly priceEditSuccess = signal(false);
+  priceData = { price: null as number | null };
 
   readonly PRODUCT_TYPES = [
     { id: 1, label: '📱 Điện thoại' },
@@ -198,6 +209,38 @@ export class HomePage implements OnInit {
       error: (err: any) => {
         this.submittingProduct.set(false);
         this.submitProductError.set(extractHttpError(err, 'Lỗi tạo sản phẩm'));
+      },
+    });
+  }
+
+  onEditPrice(product: Product): void {
+    this.priceEditItem.set(product);
+    this.priceData = { price: product.current_price != null ? Number(product.current_price) : null };
+    this.priceEditError.set(null);
+    this.priceEditSuccess.set(false);
+  }
+
+  closePriceModal(): void {
+    this.priceEditItem.set(null);
+  }
+
+  submitPrice(): void {
+    const product = this.priceEditItem();
+    const price = this.priceData.price;
+    if (!product || price == null || price < 0) return;
+
+    this.submittingPrice.set(true);
+    this.priceEditError.set(null);
+
+    this.productService.updateProductPrice(product.id, price).subscribe({
+      next: () => {
+        this.submittingPrice.set(false);
+        this.priceEditSuccess.set(true);
+        this.productState.loadPhones(this.productState.selectedBrandId() ?? undefined);
+      },
+      error: (err: any) => {
+        this.submittingPrice.set(false);
+        this.priceEditError.set(extractHttpError(err, 'Cập nhật giá thất bại. Vui lòng thử lại.'));
       },
     });
   }

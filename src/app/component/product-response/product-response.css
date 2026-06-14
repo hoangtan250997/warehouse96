@@ -196,7 +196,8 @@
 }
 
 .create-order-btn,
-.create-receipt-btn {
+.create-receipt-btn,
+.edit-price-btn {
   flex: 1;
   padding: 9px 0;
   border-radius: var(--radius-sm);
@@ -204,6 +205,18 @@
   font-weight: 600;
   cursor: pointer;
   transition: all 0.18s ease;
+}
+
+.edit-price-btn {
+  background: #fef3c7;
+  color: #b45309;
+  border: 1.5px solid transparent;
+}
+
+.edit-price-btn:hover:not(:disabled) {
+  background: #d97706;
+  color: #fff;
+  transform: translateY(-1px);
 }
 
 .create-order-btn {
